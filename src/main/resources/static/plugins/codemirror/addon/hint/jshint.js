@@ -1067,10 +1067,10 @@ var JSHINT = (function () {
 
             // If smarttabs option is used check for spaces followed by tabs only.
             // Otherwise check for any occurence of mixed tabs and spaces.
-            if (option.smarttabs)
-                at = s.search(/ \t/);
-            else
-                at = s.search(/ \t|\t /);
+//            if (option.smarttabs)
+//                at = s.search(/ \t/);
+//            else
+//                at = s.search(/ \t|\t /);
 
             if (at >= 0)
                 warningAt("Mixed spaces and tabs.", line, at + 1);
@@ -2413,8 +2413,8 @@ loop:   for (;;) {
             return i;
         }
         if (token.id === 'function' && nexttoken.id === '(') {
-            warning("Missing name in function declaration.");
-        } else {
+//            warning("Missing name in function declaration.");
+        } else {s
             error("Expected an identifier and instead saw '{a}'.",
                     nexttoken, nexttoken.value);
         }
