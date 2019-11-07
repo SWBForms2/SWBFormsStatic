@@ -332,6 +332,7 @@ isc.loadSkin = function (theWindow) {
             isc.Window.changeDefaults("maximizeButtonDefaults", {
                 src:"[SKIN]/headerIcons/maximize.gif",
                 showRollOver:true,
+                showDown:false,
                 width:15,
                 height:15
             });

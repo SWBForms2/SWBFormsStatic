@@ -1,7 +1,7 @@
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.
@@ -38,9 +38,9 @@ else if(isc._preLog)isc._preLog[isc._preLog.length]=isc._pTM;
 else isc._preLog=[isc._pTM]}isc.definingFramework=true;
 
 
-if (window.isc && isc.version != "v11.1p_2017-12-27/LGPL Deployment" && !isc.DevUtil) {
+if (window.isc && isc.version != "v12.0p_2019-08-29/LGPL Deployment" && !isc.DevUtil) {
     isc.logWarn("SmartClient module version mismatch detected: This application is loading the core module from "
-        + "SmartClient version '" + isc.version + "' and additional modules from 'v11.1p_2017-12-27/LGPL Deployment'. Mixing resources from different "
+        + "SmartClient version '" + isc.version + "' and additional modules from 'v12.0p_2019-08-29/LGPL Deployment'. Mixing resources from different "
         + "SmartClient packages is not supported and may lead to unpredictable behavior. If you are deploying resources "
         + "from a single package you may need to clear your browser cache, or restart your browser."
         + (isc.Browser.isSGWT ? " SmartGWT developers may also need to clear the gwt-unitCache and run a GWT Compile." : ""));
@@ -717,7 +717,7 @@ isc.Canvas.addMethods({
     // to the callback.
     // @param [type] (String) animation type name ("move", "resize", etc). If not passed just
     //                        finish all animations
-    // @visibility internal
+    // @visibility animation_advanced
     // @group animation
     //<
 
@@ -753,9 +753,11 @@ isc.Canvas.addMethods({
     //> @method Callbacks.AnimationCallback
     // A +link{type:Callback} called when the move completes.
     //
-    // @param earlyFinish (boolean)  parameter will be passed if the animation was
-    //                               cut short by a call to finishAnimation
-    //
+    // @param earlyFinish (boolean)  true if the animation was cut short.  To quit an animation
+    //                               early, simply call the non-animated version of the same
+    //                               API, so for example call +link{canvas.hide()} to cut short
+    //                               an animation from +link{canvas.animateHide()} already in
+    //                               progress.
     // @visibility external
     //<
 
@@ -763,9 +765,10 @@ isc.Canvas.addMethods({
     // Animate a reposition of this canvas from its current position to the specified position
     // @param left (Integer) new left position (or null for unchanged)
     // @param top (Integer) new top position (or null for unchanged)
-    // @param [callback] (AnimationCallback) When the move completes this callback will be fired. Single
-    //                            'earlyFinish' parameter will be passed if the animation was
-    //                            cut short by a call to finishAnimation
+    // @param [callback] (AnimationCallback) When the move completes this callback will be
+    //                       fired. Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       APIs +link{moveTo()} or +link{moveBy()}.
     // @param [duration] (Integer) Duration in ms of the animated move
     // @param [acceleration] (AnimationAcceleration) Optional acceleration effect to bias the ratios
     // @visibility animation
@@ -787,9 +790,10 @@ isc.Canvas.addMethods({
     // Animate a resize of this canvas from its current size to the specified size
     // @param width (Integer) new width (or null for unchanged)
     // @param height (Integer) new height (or null for unchanged)
-    // @param [callback] (AnimationCallback) When the resize completes this callback will be fired. Single
-    //                              'earlyFinish' parameter will be passed if the animation was
-    //                              cut short by a call to finishAnimation
+    // @param [callback] (AnimationCallback) When the resize completes this callback will be
+    //                       fired. Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       APIs +link{resizeTo()} or +link{resizeBy()}.
     // @param [duration] (Integer) Duration in ms of the animated resize
     // @param [acceleration] (AnimationAcceleration) Optional acceleration effect to apply to the resize
     // @visibility animation
@@ -812,9 +816,10 @@ isc.Canvas.addMethods({
     // @param top (Integer) new top position (or null for unchanged)
     // @param width (Integer) new width (or null for unchanged)
     // @param height (Integer) new height (or null for unchanged)
-    // @param [callback] (AnimationCallback) When the setRect completes this callback will be fired. Single
-    //                              'earlyFinish' parameter will be passed if the animation was
-    //                              cut short by a call to finishAnimation
+    // @param [callback] (AnimationCallback) When the setRect completes this callback will be
+    //                       fired. Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       API +link{setRect()}.
     // @param [duration] (Integer) Duration in ms of the animated setRect
     // @param [acceleration] (AnimationAcceleration) Optional acceleration effect to apply to the animation
     // @visibility animation
@@ -926,9 +931,10 @@ isc.Canvas.addMethods({
     //> @method canvas.animateFade()
     // Animate a change in opacity from the widget's current opacity to the specified opacity.
     // @param opacity (Integer) desired final opacity
-    // @param [callback] (AnimationCallback) When the fade completes this callback will be fired. Single
-    //                              'earlyFinish' parameter will be passed if the animation was
-    //                              cut short by a call to finishAnimation
+    // @param [callback] (AnimationCallback) When the fade completes this callback will be
+    //                       fired.  Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       API +link{setOpacity()}.
     // @param [duration] (Integer) Duration in ms of the animated fade
     // @param [acceleration] (AnimationAcceleration) Optional animation acceleration to bias the ratios
     // @visibility animation
@@ -999,9 +1005,10 @@ isc.Canvas.addMethods({
     // Animate a scroll from the current scroll position to the specified position.
     // @param scrollLeft (Integer) desired final left scroll position
     // @param scrollTop (Integer) desired final top scroll position
-    // @param [callback] (AnimationCallback) When the scroll completes this callback will be fired. Single
-    //                              'earlyFinish' parameter will be passed if the animation was
-    //                              cut short by a call to finishAnimation
+    // @param [callback] (AnimationCallback) When the scroll completes this callback will be
+    //                       fired. Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       APIs +link{scrollTo()} or +link{scrollBy()}.
     // @param [duration] (Integer) Duration in ms of the animated scroll
     // @param [acceleration] (AnimationAcceleration) Optional acceleration to bias the animation ratios
     // @visibility animation
@@ -1063,12 +1070,18 @@ isc.Canvas.addMethods({
     // @visibility animation
     //<
 
-    //> @attr AnimateShowEffect.endsAt (String : null : IR)
+    //> @attr AnimateShowEffect.endAt (String : null : IR)
     //   For hide animations of type <code>"wipe</code> and
     //   <code>"slide"</code> this attribute specifies where the wipe / slide should finish.
     //   Valid options are <code>"T"</code> (vertical animation upwards to the top of the canvas,
     //   the default behavior) and <code>"L"</code> (horizontal animation to the left of the
     //   canvas).
+    // @visibility animation
+    //<
+
+    //> @attr AnimateShowEffect.endsAt (String : null : IR)
+    // Use +link{endAt} instead.
+    // @deprecated This property was misnamed.
     // @visibility animation
     //<
 
@@ -1079,9 +1092,10 @@ isc.Canvas.addMethods({
     // @param [effect] (AnimateShowEffectId | AnimateShowEffect) Animation effect to use
     //      when revealing the widget. If ommitted, default behavior can be configured via
     //      +link{Canvas.animateShowEffect}
-    // @param [callback] (AnimationCallback) When the show completes this callback will be fired. Single
-    //                              'earlyFinish' parameter will be passed if the animation was
-    //                              cut short by a call to finishAnimation.
+    // @param [callback] (AnimationCallback) When the show completes this callback will be
+    //                       fired. Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       API +link{show()}.
     // @param [duration] (Integer) Duration in ms of the animated show. If unset, duration will be
     //   picked up from +link{canvas.animateShowTime}
     // @param [acceleration] (AnimationAcceleration) Optional acceleration effect function to
@@ -1726,9 +1740,10 @@ isc.Canvas.addMethods({
     // @param [effect] (AnimateShowEffectId | AnimateShowEffect) How should the content of the
     //  window be hidden during the hide? If ommitted, default behavior can be configured via
     //  +link{Canvas.animateHideEffect}
-    // @param [callback] (AnimationCallback) When the hide completes this callback will be fired. Single
-    //                              'earlyFinish' parameter will be passed if the animation was
-    //                              cut short by a call to finishAnimation.
+    // @param [callback] (AnimationCallback) When the hide completes this callback will be
+    //                       fired.  Single 'earlyFinish' parameter will be passed if the
+    //                       animation was cut short, for example by a call to the non-animated
+    //                       API +link{hide()}.
     // @param [duration] (Integer) Duration in ms of the animated hide.  If unset, duration will be
     //   picked up from +link{canvas.animateHideTime}
     // @param [acceleration] (AnimationAcceleration) Optional acceleration effect function to bias
@@ -1829,7 +1844,9 @@ isc.Canvas.addMethods({
 
         var drawnHeight = this.getVisibleHeight(),
             drawnWidth = this.getVisibleWidth(),
-            vertical = (effectConfig ? effectConfig.endAt == this._$T : true),
+
+            vertical = effectConfig ? effectConfig.endsAt == this._$T ||
+                                      effectConfig.endAt == this._$T : true,
 
             info = {_userHeight:this._userHeight, _specifiedHeight:this.getHeight(),
                     _drawnHeight:drawnHeight,
@@ -2630,7 +2647,46 @@ isc.StatefulCanvas.addProperties({
     // <P>
     // See +link{statefulCanvas.getStateSuffix()} for a description of the default set
     // of suffixes which may be applied to the baseStyle
+    // <P>
+    // <h4>Rotated Titles</h4>
+    // <p>
+    // The Framework doesn't have built-in support for rotating button titles in a fashion
+    // similar to +link{FacetChart.rotateLabels}.  However, you can manually configure
+    // a button to render with a rotated title by applying custom CSS via this property.
+    // <P>
+    // For example, given a button with a height of 120 and a width of 48, if you
+    // copied the existing buttonXXX style declarations from skin_styles.css as new,
+    // rotatedTitleButtonXXX declarations, and then added the lines:
+    // <pre>
+    //     -ms-transform:     translate(-38px,0px) rotate(270deg);
+    //     -webkit-transform: translate(-38px,0px) rotate(270deg);
+    //     transform:         translate(-38px,0px) rotate(270deg);
+    //     overflow: hidden;
+    //     text-overflow: ellipsis;
+    //     width:116px;</pre>
+    // in the declaration section beginning:
+    // <pre>
+    // .rotatedTitleButton,
+    // .rotatedTitleButtonSelected,
+    // .rotatedTitleButtonSelectedOver,
+    // .rotatedTitleButtonSelectedDown,
+    // .rotatedTitleButtonSelectedDisabled,
+    // .rotatedTitleButtonOver,
+    // .rotatedTitleButtonDown,
+    // .rotatedTitleButtonDisabled {</pre>
+    // then applying that style to the button with +link{canvas.overflow,overflow}: "clip_h"
+    // would yield a vertically-rendered title with overflow via ellipsis as expected, and also
+    // wrap with +link{button.wrap}.
     //
+    // Note that:<ul>
+    // <li> The explicit width applied via CSS is needed because rotated
+    // elements don't inherit dimensions in their new orientation from the DOM -
+    // the transform/rotation occurs independently of layout.
+    // <li> The translation transform required along the x-axis is roughly
+    // (width - height) / 2, but may need slight offsetting for optimal centering.
+    // <li>We've explicitly avoided describing an approach based on CSS "writing-mode", since
+    // support is incomplete and bugs are present in popular browsers such as Firefox and
+    // Safari that would prevent it from being used without Framework assistance.</ul>
     // @visibility external
     //<
 
@@ -2706,6 +2762,29 @@ isc.StatefulCanvas.addProperties({
     // @visibility external
     //<
     //autoFit:null
+
+    //> @attr StatefulCanvas.width (Number | String : null : [IRW])
+    // Size for this component's horizontal dimension.  See +link{Canvas.width} for more
+    // details.
+    // <P>
+    // Note that if +link{autoFit} is set, this property will be ignored so that the widget
+    // is always sized just large enough to accommodate the title.
+    // @see autoFit
+    // @group sizing
+    // @visibility external
+    //<
+
+    //> @attr StatefulCanvas.height (Number | String : null : [IRW])
+    // Size for this component's vertical dimension.  See +link{Canvas.height} for more
+    // details.
+    // <P>
+    // Note that if +link{autoFit} is set on non-+link{StretchImgButton} instances, this
+    // property will be ignored so that the widget is always sized just large enough to
+    // accommodate the title.
+    // @see autoFit
+    // @group sizing
+    // @visibility external
+    //<
 
     // autoFitDirection: Undocumented property determining whether we should auto-fit
     // horizontally, vertically or in both directions
@@ -4373,7 +4452,9 @@ handleMouseDown : function (event, eventInfo) {
         rv = this.mouseDown(event, eventInfo);
         if (rv == false) return false;
     }
-    if (this.showDown) this.setState(isc.StatefulCanvas.STATE_DOWN);
+    if (this.showDown && !this.isDisabled()) {
+            this.setState(isc.StatefulCanvas.STATE_DOWN);
+        }
     return rv;
 },
 
@@ -5302,6 +5383,24 @@ isc.Layout.addProperties({
     // @visibility external
     //<
 
+    //> @attr layout.layoutStartMargin (Integer : null : [IRW])
+    // Equivalent to +link{layoutLeftMargin} for a horizontal layout, or +link{layoutTopMargin}
+    // for a vertical layout.
+    // <p>
+    // If both <code>layoutStartMargin</code> and the more specific properties (top/left margin)
+    // are both set, the more specific properties win.
+    // @visibility external
+    //<
+
+    //> @attr layout.layoutEndMargin (Integer : null : [IRW])
+    // Equivalent to +link{layoutRightMargin} for a horizontal layout, or +link{layoutBottomMargin}
+    // for a vertical  layout.
+    // <p>
+    // If both <code>layoutEndMargin</code> and the more specific properties (right/bottom margin)
+    // are both set, the more specific properties win.
+    // @visibility external
+    //<
+
     // ResizeBars
     // ---------------------------------------------------------------------------------------
 
@@ -5458,6 +5557,7 @@ isc.Layout.addProperties({
     // <P>
     // If you want to dynamically create a component to be added to the Layout in response to a
     // drop event you can do so as follows:
+    // <smartclient>
     // <pre>
     // isc.VLayout.create({
     //   ...various layout properties...
@@ -5474,6 +5574,27 @@ isc.Layout.addProperties({
     //   }
     // });
     // </pre>
+    // </smartclient>
+    // <smartgwt>
+    // <pre>
+    //  final VLayout vLayout = new VLayout();
+    //  //...various layout properties...
+    //  vLayout.setCanDropComponents(true);
+    //  vLayout.addDropHandler(new DropHandler() {
+    //      &#64;Override
+    //      public void onDrop(DropEvent event) {
+    //          // create the new component
+    //          Canvas newMember = new Canvas();
+    //          // add to the layout at the current drop position
+    //          // (the dropLine will be showing here)
+    //          vLayout.addMember(newMember, vLayout.getDropPosition());
+    //          // hide the dropLine that was automatically shown
+    //          // by builtin SmartGWT methods
+    //          vLayout.hideDropLine();
+    //      }
+    //  });
+    // </pre>
+    // </smartgwt>
     // If you want to completely suppress the builtin drag and drop logic, but still receive drag
     // and drop events for your own custom implementation, set +link{Canvas.canAcceptDrop} to
     // <code>true</code> and <code>canDropComponents</code> to <code>false</code> on your Layout.
@@ -5883,11 +6004,11 @@ setAlign : function (align) {
 checkAlign : function (align) {
     if (this.vertical) {
         if (align == isc.Canvas.LEFT || align == isc.Canvas.RIGHT) {
-            isc.logWarn("Layout.align set to " + align + ", which is invalid for vertical layouts");
+            this.logWarn("Layout.align set to " + align + ", which is invalid for vertical layouts");
         }
     } else {
         if (align == isc.Canvas.TOP || align == isc.Canvas.BOTTOM) {
-            isc.logWarn("Layout.align set to " + align + ", which is invalid for horizontal layouts");
+            this.logWarn("Layout.align set to " + align + ", which is invalid for horizontal layouts");
         }
     }
 
@@ -7390,7 +7511,6 @@ applyStretchResizePolicy : function (sizes, totalSize, minSize, modifyInPlace) {
         return policy.call(thisClass, sizes, totalSize, minSize, modifyInPlace, this);
 },
 
-_$adaptMembers: "adaptMembers",
 adaptMembersToSpace : function (sizes, totalSpace, overflowAsFixed, layoutInfo) {
 
     var adapted = false,
@@ -7923,11 +8043,13 @@ sectionHeaderClick : function (sectionHeader) {
 // --------------------------------------------------------------------------------------------
 
 //>    @method    layout.getMember()
-// Given a numerical index or a member name or member ID, return a pointer to the appropriate member.
+// Given a numerical index or a member +link{canvas.name,name} or member +link{canvas.ID,ID},
+// return a pointer to the appropriate member.  If passed a member Canvas, just returns it.
 // <p>
-// If passed a member Canvas, just returns it.
+// Note that if more than one member has the same <code>name</code>, passing in a
+// <code>name</code> has an undefined result.
 //
-// @param memberID (String | int | Canvas)   identifier for the required member
+// @param memberID (String | int | Canvas) identifier for the required member
 // @return (Canvas)  member widget
 // @see getMemberNumber()
 // @visibility external
@@ -7939,12 +8061,13 @@ getMember : function (member) {
 },
 
 //>    @method    layout.getMemberNumber()
-// Given a member Canvas or member ID or name, return the index of that member within this
-// layout's members array
+// Given a member Canvas or member +link{canvas.ID,ID} or +link{canvas.name,name}, return the
+// index of that member within this layout's members array.  If passed a number, just returns it.
 // <p>
-// If passed a number, just returns it.
+// Note that if more than one member has the same <code>name</code>, passing in a
+// <code>name</code> has an undefined result.
 //
-// @param memberID (String | Canvas | int)   identifier for the required member
+// @param memberID (String | Canvas | int) identifier for the required member
 // @return (int) index of the member canvas (or -1 if not found)
 // @see getMember()
 // @visibility external
@@ -9914,6 +10037,18 @@ isc.Button.addProperties({
     // @visibility external
     //<
 
+    //> @attr button.width
+    // @include statefulCanvas.width
+    // @group sizing
+    // @visibility external
+    //<
+
+    //> @attr button.height
+    // @include statefulCanvas.height
+    // @group sizing
+    // @visibility external
+    //<
+
     // only autoFit horizontally by default
     autoFitDirection:"horizontal",
 
@@ -10082,7 +10217,10 @@ isc.Button.addProperties({
 
     //> @attr button.canAdaptWidth (Boolean : false : IR)
     // If enabled, the button will collapse to show just its icon when showing the title would
-    // cause overflow of a containing Layout.  See +link{Canvas.canAdaptWidth}.
+    // cause overflow of a containing Layout.  While collapsed, the button will show its title
+    // on hover, unless an explicit hover has been specified such as by overriding
+    // +link{titleHoverHTML()}.
+    // @see canvas.canAdaptWidth
     // @example buttonAdaptiveWidth
     // @visibility external
     //<
@@ -10161,7 +10299,7 @@ initWidget : function () {
     if (pushBorderToDiv) {
         if (isc.Browser.isChrome && isc.Browser.version == 61) {
 
-        this._buttonBGColor = "transparent";
+            this._buttonBGColor = "transparent";
         }
     } else {
         // Otherwise we apply the background color to the table cell along with other styling,
@@ -10186,7 +10324,9 @@ initWidget : function () {
 // If we're writing out an explicitly sized inner table override this method to also
 // resize the inner table's handle.
 _assignRectToHandle : function (left,top,width,height,styleHandle) {
+    // Resize the handle
     this.invokeSuper(isc.Button, "_assignRectToHandle", left,top,width,height,styleHandle);
+
 
     if (this.redrawOnResize && !this.isPrinting && this._explicitlySizeTable()) return;
     var tableElem = this._getTableElement();
@@ -10242,7 +10382,9 @@ titleClipped : function (startAfterNode) {
     if (titleClipperHandle == null) return false;
 
 
-    if (this.getScrollHeight() > this.getViewportHeight()) return true;
+    if (this.getScrollHeight() > this.getViewportHeight()) {
+        return true;
+    }
 
 
     if (isc.Browser.isChrome ||
@@ -10269,6 +10411,12 @@ defaultTitleHoverHTML : function () {
     return this.getTitleHTML();
 },
 
+// helper used by handleHover() in canAdaptWidth: true case
+hiddenTitleHoverHTML : function () {
+    var title = this.getTitle(true);
+    return this.formatTitle(this, title);
+},
+
 //> @method button.titleHoverHTML()
 // Returns the HTML that is displayed by the default +link{Button.titleHover(),titleHover}
 // handler. Return null or an empty string to cancel the hover.
@@ -10287,14 +10435,19 @@ handleHover : function (a, b, c) {
     // If there is a prompt, prefer the standard hover handling.
     if (this.canHover == null && this.prompt) return this.invokeSuper(isc.Button, "handleHover", a, b, c);
 
-    if (!this.showClippedTitleOnHover || !this.titleClipped()) {
+    if (!this._hideTitle && (!this.showClippedTitleOnHover || !this.titleClipped())) {
         if (this.canHover) return this.invokeSuper(isc.Button, "handleHover", a, b, c);
         else return;
     }
 
     if (this.titleHover && this.titleHover() == false) return;
 
-    var HTML = this.titleHoverHTML(this.defaultTitleHoverHTML());
+    // always return the title HTML here, even if it's hidden due to button width adaptation
+
+    var defaultHTML = this._hideTitle ? this.hiddenTitleHoverHTML() :
+                                       this.defaultTitleHoverHTML();
+
+    var HTML = this.titleHoverHTML(defaultHTML);
     if (HTML != null && !isc.isAn.emptyString(HTML)) {
         var hoverProperties = this._getHoverProperties();
         isc.Hover.show(HTML, hoverProperties, null, this);
@@ -10427,7 +10580,6 @@ getInnerHTML : function () {
         // if we're printing the button, make it fit its parent element
         // If we're not redrawing on resize, use 100% sizing - will reflow on resize of parent
         // element
-
         if (this.isPrinting || this.redrawOnResize == false) {
             // if we're not going to redraw on resize, write HTML that reflows automatically.  Not
             // yet possible in every browser.
@@ -10478,11 +10630,11 @@ getInnerHTML : function () {
         var isTitleClipper = !iconAtEdge && clipTitle;
 
 
-        var writeStyle = isTitleClipper || this.cssText || this._buttonBorder || this._buttonPadding ||
-                         this._buttonBGColor || this.margin || this._writeZeroVPadding() ||
-                         this.shouldPushTableBorderStyleToDiv() ||
-                         this.shouldPushTableShadowStyleToDiv() ||
-                         (this._getAfterPadding != null);
+        var writeStyle =
+            isTitleClipper || this.cssText || this._buttonBorder || this._buttonPadding ||
+            this._buttonBGColor || this.margin || this._writeZeroVPadding() ||
+            this.shouldPushTableBorderStyleToDiv() || this.shouldPushTableShadowStyleToDiv() ||
+            (this._getAfterPadding != null) || (this._getTopPadding != null);
 
         if (writeStyle) buttonHTML[8] = this._getCellStyleHTML(null, isTitleClipper);
         else buttonHTML[8] = null;
@@ -10535,7 +10687,6 @@ getInnerHTML : function () {
                         (isRTL && ((this.ignoreRTL && this.iconOrientation == isc.Canvas.LEFT) ||
                                    (!this.ignoreRTL && this.iconOrientation == isc.Canvas.RIGHT)))),
             b = (isRTL || opposite) && !(isRTL && opposite);
-
         var beforePadding = 0,
             afterPadding = 0,
             iconHTML = null;
@@ -10547,7 +10698,7 @@ getInnerHTML : function () {
                 align: "absmiddle",
                 extraCSSText: (b ? "margin-left:" : "margin-right:") +
                               iconSpacing + "px;vertical-align:middle",
-                extraStuff: this._$defaultImgExtraStuff
+                eventStuff: this._$defaultImgEventStuff
             });
         }
         sb.append((!opposite ? iconHTML : null),
@@ -10635,7 +10786,7 @@ _getSizeTestHTML : function (title, wrap) {
                 align: "absmiddle",
                 extraCSSText: (b ? "margin-left:" : "margin-right:") +
                               iconSpacing + "px;vertical-align:middle",
-                extraStuff: this._$defaultImgExtraStuff
+                eventStuff: this._$defaultImgEventStuff
             });
         if (opposite) {
             template[7] = title == null ? iconHTML : title + iconHTML;
@@ -10693,7 +10844,8 @@ __adjustOverflow : function (reason) {
     this.Super("__adjustOverflow", arguments);
 
 
-    if (isc.Browser.isSafari && !isc.Browser.isChrome && this.icon != null &&
+    if (isc.Browser.isSafari && !isc.Browser.isChrome && !isc.Browser.isEdge &&
+        this.icon != null &&
         !(this.isPrinting || !this._explicitlySizeTable()))
     {
         var isRTL = this.isRTL(),
@@ -10711,7 +10863,6 @@ __adjustOverflow : function (reason) {
 
             var beforePadding = extraWidth,
                 afterPadding = 0;
-
             // Reset the title clipper's left and right padding to "normal" before checking whether
             // the title is clipped.
             titleClipperStyle[isRTL ? "paddingRight" : "paddingLeft"] = beforePadding + "px";
@@ -10727,7 +10878,6 @@ __adjustOverflow : function (reason) {
                     beforePadding -= (beforePadding / 2) << 0;
                     afterPadding = iconWidth;
                 }
-
                 titleClipperStyle[isRTL ? "paddingRight" : "paddingLeft"] = beforePadding + "px";
                 titleClipperStyle[isRTL ? "paddingLeft" : "paddingRight"] = afterPadding + "px";
             }
@@ -10814,8 +10964,14 @@ _getCellStyleHTML : function (template, isTitleClipper) {
         template[6] = null;
         template[7] = null;
     }
-    if (this._writeZeroVPadding()) {
-        template[7] = (template[7] || isc.emptyString) + this._$zeroVPad;
+
+
+    var vPadding = this._getTopPadding ?
+            "padding-top:" + this._getTopPadding() + "px;padding-bottom:0px;" :
+            (this._writeZeroVPadding() ? this._$zeroVPad : null);
+    if (vPadding) {
+        if (template[7]) template[7] += vPadding;
+        else             template[7]  = vPadding;
     }
 
     if (this._buttonBGColor != null) {
@@ -10851,10 +11007,10 @@ _getCellStyleHTML : function (template, isTitleClipper) {
 
 
     if (isc.Browser.isChrome && isc.Browser.version == 61) {
-    if (this.shouldPushTableShadowStyleToDiv()) {
-        // if pushing the shadow styles to the outer div, clear the table styles here
+        if (this.shouldPushTableShadowStyleToDiv()) {
+            // if pushing the shadow styles to the outer div, clear the table styles here
             // - in _applyShadowStyle(), assign inset shadows to the table and others to the div
-        template[17] = "box-shadow:none;";
+            template[17] = "box-shadow:none;";
         }
     }
 
@@ -10863,7 +11019,7 @@ _getCellStyleHTML : function (template, isTitleClipper) {
 
 
 _writeZeroVPadding : function () {
-    return this.overflow == isc.Canvas.HIDDEN &&
+    return this.overflow == isc.Canvas.HIDDEN && !this.rotateTitle &&
            // don't remove padding during animations or text may reflow
            !this.isAnimating() &&
             (isc.Browser.isMoz || isc.Browser.isSafari || isc.Browser.isIE);
@@ -11105,14 +11261,15 @@ _imgParams : {
 },
 _$icon:"icon",
 _$defaultImgExtraCSSText: "vertical-align:middle",
-_$defaultImgExtraStuff: " eventpart='icon'",
+_$defaultImgEventStuff: " eventpart='icon'",
 _generateIconImgHTML : function (imgParams) {
     // NOTE: we reuse a single global imgParams structure, so we must set every field we ever
     // use every time.
     if (imgParams == null) {
         imgParams = this._imgParams;
         imgParams.extraCSSText = this._$defaultImgExtraCSSText;
-        imgParams.extraStuff = this._$defaultImgExtraStuff;
+        imgParams.eventStuff = this._$defaultImgEventStuff;
+        imgParams.extraStuff = null;
     }
     if (this.iconStyle != null) {
         var classText = " class='" + this.iconStyle + this._getIconStyleSuffix() + this._$singleQuote;
@@ -11164,6 +11321,10 @@ _getStatefulIconURL : function (icon) {
     if (!this.showIconState) {
         state = null;
         customState = null;
+
+
+    } else if (this.showIconCustomState == false) {
+        customState = null;
     }
 
     if (selected && !this.showSelectedIcon) selected = false;
@@ -11192,6 +11353,10 @@ _getIconStyleSuffix : function () {
     if (!this.showIconState) {
         state = isc.emptyString;
         customState = null;
+
+
+    } else if (this.showIconCustomState == false) {
+        customState = null;
     }
 
     if (selected != null && !this.showSelectedIcon) selected = null;
@@ -11214,8 +11379,8 @@ getTitleHTML : function (ignoreHide, b, c, d) {
     // FIXME: title padding should be accomplished with CSS
     if (!this.padTitle || this.align == isc.Canvas.CENTER) return title;
 
-    if (this.align == isc.Canvas.RIGHT) return title + isc.nbsp;
-    else if (this.align == isc.Canvas.LEFT) return isc.nbsp + title;
+    if      (this.align == isc.Canvas.RIGHT) return title + isc.nbsp;
+    else if (this.align == isc.Canvas.LEFT)  return isc.nbsp + title;
 },
 
 
@@ -11571,8 +11736,11 @@ setIcon : function (icon) {
 
     // Make sure that we're drawn before trying to set the image src or redraw().
     if (this.isDrawn()) {
-        if (hadIcon && (icon != null)) {
-            this.setImage(this._$icon, this._getIconURL(), null, this._iconIsSprite());
+        var src = this._getIconURL(),
+            isSprite = this._iconIsSprite()
+        ;
+        if (hadIcon && (icon != null) && this._canSetImage(this._$icon, src, isSprite)) {
+            this.setImage(this._$icon, src, null, isSprite);
         } else {
             this.redraw();
         }
@@ -11653,8 +11821,11 @@ _applyBorderStyle : function (className) {
     var styleHandle = this.getClipHandle().style,
         properties = isc.StatefulCanvas._buildBorderStyle(this.border != null, className);
 
-    // Reset all border styling.
-    styleHandle.border = styleHandle.borderRadius = isc.emptyString;
+    // if this.border is set, we don't want the CSS style to clobber it - the first param in
+    // the call to _buildBorderStyle() above will cause it to return only border-radius styles
+    // - in that case, don't clear the border setting on the styleHandle.
+    if (!this.border) styleHandle.border = isc.emptyString;
+    styleHandle.borderRadius = isc.emptyString;
     isc.addProperties(styleHandle, properties);
 },
 
@@ -12110,7 +12281,8 @@ getInnerHTML : function () {
                                             : this.getInnerHeight(),
         imageType = this.imageType;
 
-    var extraStuff = this.extraStuff;
+    var extraStuff = this.extraStuff,
+        eventStuff = this.eventStuff;
     if (this.imageStyle != null) {
         var classText = " class='" + this.imageStyle + this.getStateSuffix() + this._$singleQuote;
         if (extraStuff == null) extraStuff = classText;
@@ -12131,9 +12303,8 @@ getInnerHTML : function () {
             width = this.imageWidth;
             height = this.imageHeight;
         }
-
-        return this.imgHTML(this.getURL(), width, height, this.name,
-                            extraStuff, null, this.activeAreaHTML);
+        return this.imgHTML(this.getURL(), width, height, this.name, extraStuff, null,
+                            this.activeAreaHTML, null, eventStuff);
     }
 
     var output = isc.SB.create();
@@ -12151,7 +12322,7 @@ getInnerHTML : function () {
 
         output.append(this._$centerCell,
                       this.imgHTML(this.getURL(), this.imageWidth, this.imageHeight, this.name,
-                                   extraStuff, null, this.activeAreaHTML));
+                                   extraStuff, null, this.activeAreaHTML), null, eventStuff);
     }
 
     output.append(this._$tableEnd);
@@ -12231,10 +12402,12 @@ setSrc : function (URL) {
 resetSrc : function () {
     if (!this.isDrawn()) return;
 
+    var src = this.getURL();
+
     // depending on how the image was originally drawn,
     //    we may be able to simply reset the image
-    if (this.imageType != isc.Img.TILE) {
-        this.setImage(this.name, this.getURL());
+    if (this.imageType != isc.Img.TILE && this._canSetImage(this.name, src)) {
+        this.setImage(this.name, src);
         // The new image might have different intrinsic dimensions. Need to call adjustOverflow()
         // to refresh the scrollWidth/Height.
         this.adjustOverflow("setImage() called");
@@ -12243,8 +12416,6 @@ resetSrc : function () {
         this.markForRedraw("setSrc on tiled image");
     }
 },
-
-
 
 //> @method img.stateChanged()
 //        Update the visible state of this image by changing the URL
@@ -13157,7 +13328,8 @@ stateChanged : function (whichPart) {
 
                 if (!whichPart || item.name == whichPart) {
                     // set the image to the new state image
-                    if (!this._$blankRE.test(item.name)) {
+
+                    if (!item.src && !this._$blankRE.test(item.name)) {
                         this.setImage(item.name, this._getItemURL(item));
                     }
 
@@ -13235,7 +13407,7 @@ inWhichPart : function () {
     // ScrollerBackImg we need to take it into account, as the emptyButton is not a valid
     // target for inWhichPart(). So, if the cursor is in the emptyButton, we will return the
     // next item in the scroller, that will be the ScrollerBackImg.
-    if (item.name == "emptyButton") item = this.items[num+1];
+    if (item && item.name == "emptyButton") item = this.items[num+1];
     return (item ? item.name : null);
 }
 
@@ -13295,6 +13467,18 @@ isc.defineClass("Label", "Button").addMethods({
 
     //> @attr label.autoFit    (boolean : null : [IRW])
     // @include StatefulCanvas.autoFit
+    // @visibility external
+    //<
+
+    //> @attr label.width
+    // @include statefulCanvas.width
+    // @group sizing
+    // @visibility external
+    //<
+
+    //> @attr label.height
+    // @include statefulCanvas.height
+    // @group sizing
     // @visibility external
     //<
 
@@ -14839,15 +15023,23 @@ buttonDeselected : function (button) {
 },
 
 
-//>    @method    toolbar.itemClick() ([A])
-//    Called when one of the buttons receives a click event
-//        @group    event handling
-//        @param    item        (Button)        pointer to the button in question
-//        @param    itemNum        (number)        number of the button in question
-// @visibility external
+//> @method toolbar.itemClick() ([A])
+//  Called when one of the buttons receives a click event.
+// @param  item     (StatefulCanvas)  button in question
+// @param  itemNum  (number)          number of the button in question
+// @group  event handling
+// @visibility smartclient
 //<
 itemClick : function (item, itemNum) {
 },
+
+//> @method toolbar.sgwtItemClick() ([A])
+// @include itemClick
+// @param  targetCanvas  (StatefulCanvas)  button in question
+// @param  itemNum       (number)          number of the button in question
+// @group  event handling
+// @visibility sgwt
+//<
 
 //>    @method    toolbar.itemDoubleClick() ([A])
 //    Called when one of the buttons receives a double-click event
@@ -14968,8 +15160,9 @@ getDropPosition : function () {
 
     if (position < 0 || position > maxIndex) position = revertPosition;
 
-    // for reorder/self-drop, check canReorder flag
-    else if (selfDrag && (this.members[position] && this.members[position].canReorder == false))
+    // for reorder/self-drop, check canReorder flag, and override API (used by headers)
+    else if (selfDrag && this.members[position] && this.members[position].canReorder == false &&
+             (!this._canReorderDrop || !this._canReorderDrop(position, revertPosition)))
     {
         position = revertPosition;
     }
@@ -15315,6 +15508,18 @@ isc.defineClass("ImgButton", "Img").addProperties({
     // @visibility external
     //<
 
+    //> @attr imgButton.width
+    // @include statefulCanvas.width
+    // @group sizing
+    // @visibility external
+    //<
+
+    //> @attr imgButton.height
+    // @include statefulCanvas.height
+    // @group sizing
+    // @visibility external
+    //<
+
     // baseStyle
     //----------
     //> @attr imgButton.baseStyle (CSSStyleName : "imgButton" : IRW)
@@ -15497,7 +15702,10 @@ isc.defineClass("ImgButton", "Img").addProperties({
     //>    @attr ImgButton.overflow      (String : "hidden" : IRW)
     // Clip by default, because expanding to the label (if present) is likely to distort image
     //<
-    overflow:isc.Canvas.HIDDEN
+    overflow:isc.Canvas.HIDDEN,
+
+
+    useImageForSVG:isc.Browser.isEdge
 
 });
 
@@ -15703,6 +15911,18 @@ isc.defineClass("StretchImgButton", "StretchImg").addProperties({
     //<
     //> @method stretchImgButton.setAutoFit()
     // @include statefulCanvas.setAutoFit
+    // @visibility external
+    //<
+
+    //> @attr stretchImgButtonwidth
+    // @include statefulCanvas.width
+    // @group sizing
+    // @visibility external
+    //<
+
+    //> @attr stretchImgButtonheight
+    // @include statefulCanvas.height
+    // @group sizing
     // @visibility external
     //<
 
@@ -16473,7 +16693,7 @@ isc.defineClass("ToolStripSpacer", "LayoutSpacer").addProperties({
 
 isc.defineClass("ToolStripButton", "Button").addProperties({
 
-    showTitle:true,
+    //showTitle:true,
     showRollOver:true,
     showDown:true,
 
@@ -17064,9 +17284,11 @@ isc.defineClass("ToolStripGroup", "VLayout").addProperties({
     _updateLabel : function () {
 
         var innerWidth = this.getInnerWidth(),
-            visibleWidth =  this.body.getVisibleWidth(),
-            newWidth = (innerWidth >= 0 ? innerWidth : visibleWidth)
+            newWidth = innerWidth
         ;
+        if (newWidth < 0) {
+            newWidth =  this.body ? this.body.getVisibleWidth() : this.getVisibleWidth();
+        }
 
         if (this.label) this.label.setWidth(newWidth);
     }
@@ -17248,6 +17470,13 @@ setIcon : function (icon) {
     this.setTitle(this._originalTitle);
 },
 
+stateChanged : function () {
+    var result = this.Super("stateChanged", arguments);
+    // rebuild the title, to include stateful icons for example
+    this.setTitle(this._originalTitle);
+    return result;
+},
+
 //> @attr iconButton.largeIcon (SCImgURL : null : IRW)
 // Icon to show above the title when +link{orientation} is "vertical".
 // <P>
@@ -17310,7 +17539,7 @@ getTitle : function () {
             src: icon,
             width: iconSize,
             height: iconSize,
-            extraStuff: " eventpart='icon'",
+            eventStuff: " eventpart='icon'",
             cssClass: isLarge ? "iconButtonVIcon" : "iconButtonHIcon"
         }) : null
     ;
@@ -17325,7 +17554,7 @@ getTitle : function () {
                 width: this.menuIconWidth,
                 height: this.menuIconHeight,
                 name: "menuIcon",
-                extraStuff: " eventpart='menuIcon'",
+                eventStuff: " eventpart='menuIcon'",
                 cssClass: isLarge ? "iconButtonVMenuIcon" : "iconButtonHMenuIcon"
             }) : null);
         ;
@@ -17372,7 +17601,8 @@ _getMenuIconURL : function () {
     //this.logWarn(isc.echoFull("state is " + state));
 
     // ignore states we don't care about
-    if (state == sc.STATE_DISABLED && !this.showMenuIconDisabled) state = null;
+    if (state == sc.STATE_DOWN && !this.showMenuIconDown) state = null;
+    else if (state == sc.STATE_DISABLED && !this.showMenuIconDisabled) state = null;
     else if (state == sc.STATE_OVER && (!this.showMenuIconOver || !this.showingMenuButtonOver))
         state = null;
 
@@ -17447,6 +17677,13 @@ click : function () {
 // @visibility external
 //<
 showMenuIconOver: true,
+
+//> @attr iconButton.showMenuIconDown (Boolean : false : IRW)
+// Whether to show a Down version of the +link{menuIconSrc, menuIcon}.
+//
+// @visibility internal
+//<
+showMenuIconDown: false,
 
 //> @attr iconButton.showMenuIconDisabled (Boolean : true : IRW)
 // Whether to show a Disabled version of the +link{menuIconSrc, menuIcon}.
@@ -17832,7 +18069,10 @@ isc.SectionStack.addProperties({
     // order for accessibility.
     // May be overridden at the Section level via +link{SectionStackSection.canTabToHeader}
     // <P>
-    // If unset, section headers will be focusable if +link{isc.setScreenReaderMode} has been called.
+    // If unset, section headers will be focusable if <smartclient>+link{isc.setScreenReaderMode}
+    // </smartclient>
+    // <smartgwt>{@link com.smartgwt.client.util.SC#setScreenReaderMode SC.setScreenReaderMode()}
+    // </smartgwt> has been called.
     // See +link{group:accessibility}.
     // @visibility external
     //<
@@ -18462,6 +18702,42 @@ isc.SectionStack.addMethods({
                 section._tabPanel.setAriaState("owns", itemIDs.join(" "));
             }
         }
+    },
+
+    //> @method sectionStack.setItems()
+    // Sets a new list of canvii as items into the specified section by removing the existing
+    // items, then adding the new ones.  Initial items for a section should be specified using
+    // the property +link{sectionStackSection.items}.
+    // @param section (String | Number) ID or index of the section to remove item from
+    // @param items (Array of Canvas) new items to add
+    // @visibility external
+    //<
+    setItems : function (section, items) {
+        if (!section) return;
+
+        // delay reflow until we're done
+        var oldSetting = this.instantRelayout;
+        this.instantRelayout = false;
+
+        // first remove all existing items from the section
+        var sectionHeader = this.getSection(section);
+        while (sectionHeader.items.length > 0) {
+            this.removeItem(section, sectionHeader.items.last());
+        }
+
+
+
+        // now the new items must be added to the section
+        if (!isc.isAn.Array(items)) items = [items];
+        for (var i = 0; i < items.length; i++) {
+            this.addItem(section, items[i], i);
+        }
+
+
+
+        // reflow now if so configured
+        this.instantRelayout = oldSetting;
+        if (oldSetting) this.reflowNow();
     },
 
     //> @method sectionStack.setSectionProperties()
@@ -20443,6 +20719,20 @@ isc._thumbProperties = {
     triggerAreaBottom: 0,
     triggerAreaLeft: 0,
 
+    _updateTriggerArea : function (scrollTarget) {
+        var vertical = this.scrollbar.vertical,
+            offset = isc.Browser.isTouch ? 8 : 0,
+            scrollTargetIsRTL = scrollTarget == null ? isc.Page.isRTL() : scrollTarget.isRTL()
+        ;
+        this.setTriggerAreaLeft(vertical && !scrollTargetIsRTL ? offset : 0);
+        this.setTriggerAreaRight(vertical && scrollTargetIsRTL ? offset : 0);
+    },
+
+    enableTouchSupport : function () {
+        this.Super("enableTouchSupport", arguments);
+        if (this.triggerArea) this._updateTriggerArea();
+    },
+
 
     showDisabled:false,
 
@@ -20466,7 +20756,7 @@ isc._thumbProperties = {
 
     // send special notifications for some events
     mouseOver : function () {return this.scrollbar.thumbOver();},
-    mouseOut : function () {return this.scrollbar.thumbOut();},
+    mouseOut : function (event) {return this.scrollbar.thumbOut(event);},
     mouseDown : function () {return this.scrollbar.thumbDown();},
     dragStart : function () {return this.scrollbar.thumbDragStart();},
     dragMove : function () {return this.scrollbar.thumbMove();},
@@ -20954,6 +21244,9 @@ setScrollTarget : function (newTarget) {
         delete this.scrollTarget[this.vertical ? "_vscrollbar" : "_hscrollbar"];
     }
 
+    // setScrollTarget() can be called to switch targets, so clear any previous eventParent
+    if (this.scrollTarget && this.scrollTarget.receiveScrollbarEvents) this._redirectEvents();
+
     // If a newTarget was specified, set the scrollTarget to it.
     // If a newTarget was not specified, we'll use the current scrollTarget. If the
     // current scrollTarget isn't set, we use the scrollBar itself to avoid
@@ -20965,17 +21258,18 @@ setScrollTarget : function (newTarget) {
     // We now are sure that we have a scrollTarget. If the scrollTarget has been changed
     // then we re-observe it. Otherwise, we're done.
 
-    if (this._selfManaged && this.scrollTarget != this) {
-         this.observe(this.scrollTarget, "scrollTo",        "observer.setThumb()");
-        this.observe(this.scrollTarget, "_adjustOverflow", "observer.setThumb()");
-        this._setScrollbarOnTarget(this.scrollTarget);
+    var scrollTarget = this.scrollTarget;
+    if (this._selfManaged && scrollTarget != this) {
+         this.observe(scrollTarget, "scrollTo",        "observer.setThumb()");
+        this.observe(scrollTarget, "_adjustOverflow", "observer.setThumb()");
+        this._setScrollbarOnTarget(scrollTarget);
     }
 
-    if (this.thumb != null) {
-        var scrollTargetIsRTL = newTarget == null ? isc.Page.isRTL() : newTarget.isRTL();
-        this.thumb.setTriggerAreaLeft(this.vertical && !scrollTargetIsRTL ? 8 : 0);
-        this.thumb.setTriggerAreaRight(this.vertical && scrollTargetIsRTL ? 8 : 0);
-    }
+
+    if (scrollTarget.receiveScrollbarEvents) this._redirectEvents(scrollTarget);
+
+    // update the thumb's trigger area to deal with new scroll target
+    if (this.thumb != null) this.thumb._updateTriggerArea(newTarget);
 
     // call setThumb to figure out how big and where the scrollbar thumb should be
     // note: this will enable and disable the scrollbar if autoEnable is true
@@ -21073,7 +21367,11 @@ makeThumb : function () {
 
     // Note: Scrollbar sets its textDirection to "ltr", so even if running in RTL mode, `this.isRTL()'
     // will be false.
-    var scrollTargetIsRTL = this.scrollTarget == null ? isc.Page.isRTL() : this.scrollTarget.isRTL();
+
+
+    var scrollTargetIsRTL = this.scrollTarget == null ? isc.Page.isRTL() : this.scrollTarget.isRTL(),
+        triggerAreaOffset = isc.Browser.isTouch ? 8 : 0
+    ;
 
     // figure out derived attributes
     var classObject = this.vertical ? this.vThumbClass : this.hThumbClass;
@@ -21090,10 +21388,10 @@ makeThumb : function () {
         // In LTR mode, the trigger area cannot extend to the right of the thumb without increasing
         // the scrollWidth of the scrollTarget. Similarly, in RTL mode the trigger area cannot
         // extend to the left of the thumb without increasing the scrollWidth.
-        triggerAreaLeft: this.vertical && !scrollTargetIsRTL ? 8 : 0,
-        triggerAreaRight: this.vertical && scrollTargetIsRTL ? 8 : 0,
+        triggerAreaLeft: this.vertical && !scrollTargetIsRTL ? triggerAreaOffset : 0,
+        triggerAreaRight: this.vertical && scrollTargetIsRTL ? triggerAreaOffset : 0,
 
-        triggerAreaTop: !this.vertical ? 8 : 0,
+        triggerAreaTop: !this.vertical ? triggerAreaOffset : 0,
 
         dragScrollDirection : this.vertical ? isc.Canvas.VERTICAL : isc.Canvas.HORIZONTAL
     });
@@ -21467,10 +21765,13 @@ handleMouseMove : function () {
 //            may redraw the button
 //        @group    events
 //<
-handleMouseOut : function () {
+handleMouseOut : function (event) {
     if (this.ns.EH.mouseIsDown()) return isc.EH.STOP_BUBBLING;
     if (this.showRollOver) {
         this.setState(isc.StatefulCanvas.STATE_UP);
+    }
+    if (this._shouldSuppressMouseOut(event)) {
+        return isc.EH.STOP_BUBBLING;
     }
 },
 
@@ -21524,9 +21825,12 @@ thumbOver : function () {
 //
 //        @return    (boolean)    false == cancel event processing
 //<
-thumbOut : function () {
+thumbOut : function (event) {
     if (!isc.EH.mouseIsDown()) {
         this.thumb.setState(isc.StatefulCanvas.STATE_UP);
+    }
+    if (this._shouldSuppressMouseOut(event)) {
+        return isc.EH.STOP_BUBBLING;
     }
 },
 
@@ -21557,8 +21861,8 @@ thumbDown : function () {
 thumbDragStart : function () {
     // set the offsetX and offsetY so the thumb moves with the mouse properly
     var EH = isc.EH;
-    EH.dragOffsetX = this.thumb.getOffsetX(EH.mouseDownEvent);
-    EH.dragOffsetY = this.thumb.getOffsetY(EH.mouseDownEvent);
+    EH.setDragOffset(this.thumb.getOffsetX(EH.mouseDownEvent),
+                     this.thumb.getOffsetY(EH.mouseDownEvent));
     this._dragScrolling = true;
     return EH.STOP_BUBBLING;
 },
@@ -21665,6 +21969,26 @@ hide : function (a,b,c,d) {
         this.moveTo(this.scrollTarget.getLeft(), this.scrollTarget.getTop());
         this.resizeTo(1,1);
     }
+},
+
+// helper to set eventParent of both this scrollbar and the thumb
+_redirectEvents : function (eventParent) {
+    var thumb = this.thumb;
+    if (!eventParent) eventParent = null;
+    this.eventParent = eventParent;
+    if (thumb != null) thumb.eventParent = eventParent;
+},
+
+
+_shouldSuppressMouseOut : function (event) {
+    var target = event.target;
+    return target && target == this.scrollTarget && target.receiveScrollbarEvents;
+},
+
+// whether canvas is one of ours (the scrollbar or thumb) that bubbles to scrollTarget
+_hasScrollTargetEventParent : function (canvas) {
+    if (this.disabled) return false;
+    return canvas == this || canvas && canvas == this.thumb;
 }
 
 });
@@ -21792,6 +22116,13 @@ isc.NativeScrollbar.addProperties({
 
         canFocus: false,
 
+        // parallels Scrollbar.thumbOut()
+        mouseOut : function (event) {
+            if (this.creator._shouldSuppressMouseOut(event)) {
+                return isc.EH.STOP_BUBBLING;
+            }
+        },
+
         // Respond to a user scrolling this scrollbar by scrolling our scroll target
         _handleCSSScroll : function (waited, fromFocus) {
             this.Super("_handleCSSScroll", arguments);
@@ -21865,6 +22196,11 @@ isc.NativeScrollbar.addProperties({
             this.ignore(this.scrollTarget, "scrollTo");
         }
 
+        // setScrollTarget() can be called to switch targets, so clear any previous eventParent
+        if (this.scrollTarget && this.scrollTarget.receiveScrollbarEvents) {
+            this._redirectEvents();
+        }
+
         // If a newTarget was specified, set the scrollTarget to it.
         // If a newTarget was not specified, we'll use the current scrollTarget. If the
         // current scrollTarget isn't set, we use the scrollBar itself to avoid
@@ -21877,12 +22213,13 @@ isc.NativeScrollbar.addProperties({
         // if we've got a scrollTarget and we weren't created by adjustOverflow in the target,
         //    we should observe the _adjustOverflow method of the target to make sure the
         //    size of the thumb matches the visible portion of the target.
-        if (this._selfManaged &&
-             this.scrollTarget != this &&
-             this.scrollTarget != newTarget) {
+        var scrollTarget = this.scrollTarget;
+        if (this._selfManaged && scrollTarget != this && scrollTarget != newTarget) {
             this.observe(this.scrollTarget, "scrollTo", "observer.setThumb()");
         }
 
+
+        if (scrollTarget.receiveScrollbarEvents) this._redirectEvents(scrollTarget);
     },
 
     //>    @method    nativeScrollbar.setThumb()    (A)
@@ -21983,10 +22320,37 @@ isc.NativeScrollbar.addProperties({
     setShowCorner : function (showCorner) {
         this.showCorner = showCorner;
         this.sizeScrollbarCanvas();
+    },
+
+    //
+    // Handle Canvas.receiveScrollbarEvents - migrated from Scrollbar class
+
+    handleMouseOut : function (event) {
+        if (this._shouldSuppressMouseOut(event)) return isc.EH.STOP_BUBBLING;
+    },
+
+    // helper to set eventParent of both this scrollbar and the thumb
+    _redirectEvents : function (eventParent) {
+        if (!eventParent) eventParent = null;
+        this.eventParent = eventParent;
+
+        var scrollbarCanvas = this.scrollbarCanvas;
+        if (scrollbarCanvas != null) {
+            scrollbarCanvas.eventParent = eventParent;
+        }
+    },
+
+
+    _shouldSuppressMouseOut : function (event) {
+        var target = event.target;
+        return target && target == this.scrollTarget && target.receiveScrollbarEvents;
+    },
+
+    // whether canvas is one of ours (the scrollbar or thumb) that bubbles to scrollTarget
+    _hasScrollTargetEventParent : function (canvas) {
+        if (this.disabled) return false;
+        return canvas == this || canvas && canvas == this.scrollbarCanvas;
     }
-
-
-
 });
 
 
@@ -22054,6 +22418,10 @@ isc.ScrollStick.addMethods({
 // <p>
 // To specify the resizeBar class for some layout, use the +link{layout.resizeBarClass}
 // property.
+// <P>
+// On mobile devices, you may find that you need to increase the breadth of the bar to make
+// interacting with it easier (e.g. dragging or tapping).  For +link{Layout} resize bars,
+// this can be done by setting +link{Layout.resizeBarSize}.
 //
 // @see class:Layout
 // @see class:ImgSplitbar
@@ -22190,15 +22558,12 @@ isc._SplitbarProperties = {
     //<
     canCollapse:true,   // enables click-to-collapse behavior
 
-    //> @attr splitbar.canCollapseOnTap (boolean : false : IRW)
+    //> @attr splitbar.canCollapseOnTap (boolean : true : IRW)
     // If +link{Splitbar.canCollapse,canCollapse} is <code>true</code>, should a tap result in
-    // collapsing/uncollapsing the +link{Splitbar.target,target}? By default this is <code>false</code>
-    // because it can be difficult to tap a thin <code>Splitbar</code>.
-    // <p>
-    // If this property is set to <code>true</code>, it is recommended to increase the width/height
-    // of the <code>Splitbar</code> on touch devices (see, e.g., +link{Layout.resizeBarSize}).
+    // collapsing/uncollapsing the +link{Splitbar.target,target}?
     // @visibility external
     //<
+    canCollapseOnTap:true,
 
     // cursor - default to different cursors based on vertical or horizontal splitbars
     //> @attr splitbar.cursor (Cursor : "hand" : IRW)
@@ -23010,7 +23375,7 @@ applyNewStretchResizePolicy : function (sizes, totalSize, commonMinSize, modifyI
             }
         }
         if (i < 0) {
-            this.logWarn("stretchResize" + (propertyTarget ? " for " + propertyTarget.ID : "") +
+            this.logInfo("stretchResize" + (propertyTarget ? " for " + propertyTarget.ID : "") +
                          " with totalSize: " + totalSize + " and calculated sizes: " +
                          resultSizes + "; cannot assign remainingSpace: " + remainingSpace +
                          " due to member max size limits", "listPolicy");
@@ -23077,6 +23442,16 @@ applyNewStretchResizePolicy : function (sizes, totalSize, commonMinSize, modifyI
 isc.ClassFactory.defineClass("GroupingMessages");
 
 isc.GroupingMessages.addClassProperties({
+    //> @classAttr GroupingMessages.upcomingBeforeTitle   (String : "Before" : IRW)
+    // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
+    // this is the group title for all records in which the grouped date field occurs before
+    // the current date.
+    //
+    // @visibility external
+    // @group i18nMessages
+    //<
+    upcomingBeforeTitle: "Before",
+
     //> @classAttr GroupingMessages.upcomingTodayTitle   (String : "Today" : IRW)
     // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
     // this is the group title for all records in which the grouped date field occurs today,
@@ -23117,30 +23492,50 @@ isc.GroupingMessages.addClassProperties({
     //<
     upcomingNextWeekTitle: "Next Week",
 
+    //> @classAttr GroupingMessages.upcomingThisMonthTitle   (String : "This Month" : IRW)
+    // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
+    // this is the group title for all records in which the grouped date field occurs this
+    // month, relative to the current date.
+    //
+    // @visibility external
+    // @group i18nMessages
+    //<
+    upcomingThisMonthTitle: "This Month",
+
     //> @classAttr GroupingMessages.upcomingNextMonthTitle   (String : "Next Month" : IRW)
     // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
-    // this is the group title for all records in which the grouped date field occurs next month,
-    // relative to the current date.
+    // this is the group title for all records in which the grouped date field occurs next
+    // month, relative to the current date.
     //
     // @visibility external
     // @group i18nMessages
     //<
     upcomingNextMonthTitle: "Next Month",
 
-    //> @classAttr GroupingMessages.upcomingBeforeTitle   (String : "Before" : IRW)
+    //> @classAttr GroupingMessages.upcomingThisYearTitle   (String : "This Year" : IRW)
     // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
-    // this is the group title for all records in which the grouped date field occurs before
-    // the current date.
+    // this is the group title for all records in which the grouped date field occurs in the
+    // same year as the current date.
     //
     // @visibility external
     // @group i18nMessages
     //<
-    upcomingBeforeTitle: "Before",
+    upcomingThisYearTitle: "This Year",
+
+    //> @classAttr GroupingMessages.upcomingNextYearTitle   (String : "Next Year" : IRW)
+    // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
+    // this is the group title for all records in which the grouped date field occurs next
+    // year, relative to the current date.
+    //
+    // @visibility external
+    // @group i18nMessages
+    //<
+    upcomingNextYearTitle: "Next Year",
 
     //> @classAttr GroupingMessages.upcomingLaterTitle   (String : "Later" : IRW)
     // When a +link{ListGrid} is grouped by a date field in 'Upcoming' mode,
-    // this is the group title for all records in which the grouped date field occurs later than
-    // one month after today's date.
+    // this is the group title for all records in which the grouped date field occurs later
+    // than the end of next year, relative to the current date.
     //
     // @visibility external
     // @group i18nMessages
@@ -23331,9 +23726,14 @@ isc.builtinTypes =
 
 
     //any:{},
-    text:{validators:{type:"isString", typeCastValidator:true}},
-    "boolean":{validators:{type:"isBoolean", typeCastValidator:true}},
+    text:{validators:{type:"isString", typeCastValidator:true},
+        defaultOperator: "iContains"
+    },
+    "boolean":{validators:{type:"isBoolean", typeCastValidator:true},
+        defaultOperator: "equals"
+    },
     integer:{validators:{type:"isInteger", typeCastValidator:true},
+        defaultOperator: "equals",
         normalDisplayFormatter : function (value, field) {
            if (isc.isA.Number(value)) return value.toFormattedString();
            return value;
@@ -23359,6 +23759,7 @@ isc.builtinTypes =
         }
     },
     "float":{validators:{type:"isFloat", typeCastValidator:true},
+        defaultOperator: "equals",
         normalDisplayFormatter : function (value, field) {
            if (isc.isA.Number(value)) return value.toFormattedString();
            return value;
@@ -23386,6 +23787,7 @@ isc.builtinTypes =
         }
     },
     date:{validators:{type:"isDate", typeCastValidator:true},
+        defaultOperator: "equals",
         normalDisplayFormatter : function (value, field) {
            if (isc.isA.Date(value)) return value.toNormalDate();
            return value;
@@ -23496,13 +23898,16 @@ isc.builtinTypes =
                         break;
                     case "upcoming":
                         var today = new Date();
-                        if (today.isToday(value)) return 1;
-                        else if (today.isTomorrow(value)) return 2;
-                        else if (today.isThisWeek(value)) return 3;
-                        else if (today.isNextWeek(value)) return 4;
-                        else if (today.isNextMonth(value)) return 5;
-                        else if (today.isBeforeToday(value)) return 7;
-                        else return 6;
+                        if (today.isBeforeToday(value)) return 1;
+                        else if (today.isToday(value)) return 2;
+                        else if (today.isTomorrow(value)) return 3;
+                        else if (today.isThisWeek(value)) return 4;
+                        else if (today.isNextWeek(value)) return 5;
+                        else if (today.isThisMonth(value)) return 6;
+                        else if (today.isNextMonth(value)) return 7;
+                        else if (today.getFullYear() == value.getFullYear()) return 8;
+                        else if (today.getFullYear() + 1 == value.getFullYear()) return 9;
+                        else return 10;
                         break;
                }
            }
@@ -23589,12 +23994,15 @@ isc.builtinTypes =
                         break;
                     case "upcoming":
                         var today = new Date();
-                        if (value == 1) return isc.GroupingMessages.upcomingTodayTitle;
-                        else if (value == 2) return isc.GroupingMessages.upcomingTomorrowTitle;
-                        else if (value == 3) return isc.GroupingMessages.upcomingThisWeekTitle;
-                        else if (value == 4) return isc.GroupingMessages.upcomingNextWeekTitle;
-                        else if (value == 5) return isc.GroupingMessages.upcomingNextMonthTitle;
-                        else if (value == 7) return isc.GroupingMessages.upcomingBeforeTitle;
+                        if (value == 1) return isc.GroupingMessages.upcomingBeforeTitle;
+                        else if (value == 2) return isc.GroupingMessages.upcomingTodayTitle;
+                        else if (value == 3) return isc.GroupingMessages.upcomingTomorrowTitle;
+                        else if (value == 4) return isc.GroupingMessages.upcomingThisWeekTitle;
+                        else if (value == 5) return isc.GroupingMessages.upcomingNextWeekTitle;
+                        else if (value == 6) return isc.GroupingMessages.upcomingThisMonthTitle;
+                        else if (value == 7) return isc.GroupingMessages.upcomingNextMonthTitle;
+                        else if (value == 8) return isc.GroupingMessages.upcomingThisYearTitle;
+                        else if (value == 9) return isc.GroupingMessages.upcomingNextYearTitle;
                         else return isc.GroupingMessages.upcomingLaterTitle;
                         break;
                 }
@@ -23603,6 +24011,7 @@ isc.builtinTypes =
         }
     },
     time:{validators:{type:"isTime", typeCastValidator:true},
+        defaultOperator: "equals",
         normalDisplayFormatter : function (value, field) {
            if (isc.isA.Date(value)) return isc.Time.toTime(value, null, true);
            return value;
@@ -23697,15 +24106,15 @@ isc.builtinTypes =
     },
     percent:{inheritsFrom:"integerPercent"},
     sequence:{inheritsFrom:"integer"},
-    "enum":{validators:"isOneOf"},
+    "enum":{validators:"isOneOf", defaultOperator: "equals" },
     "intEnum":{inheritsFrom:"integer",validators:"isOneOf"},
     regexp:{inheritsFrom:"text", validators:"isRegexp"},
     identifier:{inheritsFrom:"text", validators:"isIdentifier"},
     URL:{inheritsFrom:"text"},
     image:{inheritsFrom:"text"},
     HTML:{inheritsFrom:"text"},
-    measure:{validators:"isMeasure"},
-    integerOrAuto:{validators:"integerOrAuto"},
+    measure:{validators:"isMeasure", defaultOperator: "equals"},
+    integerOrAuto:{validators:"integerOrAuto", defaultOperator: "equals"},
     expression:{inheritsFrom:"text"},
     method:{inheritsFrom:"text"},
     "function":{inheritsFrom:"text"},
@@ -23776,12 +24185,9 @@ isc.builtinTypes =
         editFormatter : function (value, field) {
             // when editing a float, the string should include the localized decimalSymbol,
             // but not the groupingSymbols - the 4th param to this call deals with that
-            var res = isc.isA.String(value) ? value : isc.NumberUtil.floatValueToLocalizedString(
-                    value,
-                    field.decimalPrecision,
-                    field.decimalPad,
-                    true
-            );
+
+            var res = isc.isA.String(value) ? value :
+                    isc.NumberUtil.floatValueToLocalizedString(value, null, null, true);
             return res;
         },
         parseInput : function (value) {
@@ -24888,6 +25294,49 @@ isc.SimpleType.addClassMethods({
         if (isc.isA.Function(summaryFunction)) {
             return summaryFunction(records, field, summaryConfig, displayComponent);
         }
+    },
+
+    //> @attr simpleType.validOperators (Array of OperatorId : null : IR)
+    // Set of search operators valid for this type.
+    // <P>
+    // If not specified, the +link{inheritsFrom,inherited} type's operators will be used, finally
+    // defaulting to the default operators for the basic types (eg, integer).
+    // @group advancedFilter
+    // @visibility external
+    //<
+
+    getValidOperators : function (typeName) {
+        typeName = typeName || "text";
+        var typeObj = this.getType(typeName);
+        if (typeObj) {
+            if (typeObj.validOperators != null) {
+                return typeObj.validOperators;
+            }
+            if (typeObj.inheritsFrom != null && typeObj.inheritsFrom != typeName) {
+                return this.getValidOperators(typeObj.inheritsFrom);
+            }
+        }
+    },
+
+    //> @attr simpleType.defaultOperator (OperatorId : null : IR)
+    // The default search-operator for this data-type.
+    // @group advancedFilter
+    // @visibility external
+    //<
+
+    getDefaultOperator : function (typeName) {
+        typeName = typeName || "text";
+        var typeObj = this.getType(typeName);
+        if (typeObj) {
+            if (typeObj.defaultOperator != null) {
+                return typeObj.defaultOperator;
+            }
+            if (typeObj.inheritsFrom != null && typeObj.inheritsFrom != typeName) {
+                return this.getDefaultOperator(typeObj.inheritsFrom);
+            }
+        }
+        // if there's no type or defaultOp, return "iContains"
+        //return "iContains";
     }
 
 });
@@ -27740,7 +28189,7 @@ isc.defineClass("SplitPanePagedPanel", "Canvas").addProperties({
         height: "100%",
         overflow: "visible",
 
-        getTransformCSS : function () {
+        _getTranslateX : function () {
             var creator = this.creator;
             if (!creator.animateTransitions || !isc.Browser._supportsCSSTransitions || !creator.skinUsesCSSTransitions) {
                 return null;
@@ -27752,10 +28201,27 @@ isc.defineClass("SplitPanePagedPanel", "Canvas").addProperties({
                 } else {
                     left = 0;
                 }
-                // Android 2.x does not support 3D transforms.
-                // http://caniuse.com/transforms3d
-                return ";" + isc.Element._transformCSSName + ": translateX(" + left + "px);";
+                return left;
             }
+        },
+
+        getTransformCSS : function () {
+            var left = this._getTranslateX();
+            if (left == null) return null;
+
+            // Android 2.x does not support 3D transforms.
+            // http://caniuse.com/transforms3d
+            return ";" + isc.Element._transformCSSName + ": translateX(" + left + "px);";
+        },
+
+
+        scrollIntoView : function (x, y) {
+
+            if (x != null) {
+                var left = this._getTranslateX();
+                if (left != null) x += left;
+            }
+            return this.Super("scrollIntoView", arguments);
         },
 
         _transitionEnded : function (transitionRemoved) {
@@ -29839,6 +30305,8 @@ isc.SplitPane.addProperties({
     // @visibility external
     //<
     showNavigationPane : function (direction, fromHistoryCallback, forceUIRefresh) {
+        if (!this.navigationPane || !this.navigationPane.isVisible()) forceUIRefresh = true;
+
         var changed = this.currentPane != null && this.currentPane !== "navigation";
         this.currentPane = "navigation";
         // If coming from the history callback, then we need to refresh the UI because the
@@ -29916,11 +30384,15 @@ isc.SplitPane.addProperties({
     // is <code>true</code>, this is the direction passed to +link{NavigationBar.setViewState()}.
     // @visibility external
     //<
-    showListPane : function (listPaneTitle, backButtonTitle, direction, fromHistoryCallback, forceUIRefresh) {
+    showListPane : function (listPaneTitle, backButtonTitle, direction, fromHistoryCallback,
+                             forceUIRefresh)
+    {
         if (!this._hasListPane()) {
             this.logWarn("Attempted to show the list pane, but this SplitPane does not have a list pane. Ignoring.");
             return;
         }
+
+        if (!this.listPane || !this.listPane.isVisible()) forceUIRefresh = true;
 
         var changed = (this.currentPane !== "list");
         if (listPaneTitle != null) this.listTitle = listPaneTitle;
@@ -29928,7 +30400,8 @@ isc.SplitPane.addProperties({
         this.currentPane = "list";
         // If coming from the history callback, then we need to refresh the UI because the
         // list title might be different or there might be an overridden back button title.
-        this.updateUI(listPaneTitle != null || backButtonTitle != null || fromHistoryCallback || forceUIRefresh, direction);
+        this.updateUI(listPaneTitle != null || backButtonTitle != null ||
+                      fromHistoryCallback || forceUIRefresh, direction);
 
         if (changed) {
             if (!fromHistoryCallback) {
@@ -30000,14 +30473,19 @@ isc.SplitPane.addProperties({
     // is <code>true</code>, this is the direction passed to +link{NavigationBar.setViewState()}.
     // @visibility external
     //<
-    showDetailPane : function (detailPaneTitle, backButtonTitle, direction, fromHistoryCallback, forceUIRefresh) {
+    showDetailPane : function (detailPaneTitle, backButtonTitle, direction, fromHistoryCallback,
+                               forceUIRefresh)
+    {
+        if (!this.detailPane || !this.detailPane.isVisible()) forceUIRefresh = true;
+
         var changed = (this.currentPane !== "detail");
         if (detailPaneTitle != null) this.detailTitle = detailPaneTitle;
         if (backButtonTitle != null) this._overriddenBackButtonTitle = backButtonTitle;
         this.currentPane = "detail";
         // If coming from the history callback, then we need to refresh the UI because the
         // detail title might be different or there might be an overridden back button title.
-        this.updateUI(detailPaneTitle != null || backButtonTitle != null || fromHistoryCallback || forceUIRefresh, direction);
+        this.updateUI(detailPaneTitle != null || backButtonTitle != null ||
+                      fromHistoryCallback || forceUIRefresh, direction);
 
         if (changed) {
             if (!fromHistoryCallback) {
@@ -30057,12 +30535,15 @@ isc.SplitPane.addProperties({
     _parsePaneTitleTemplate : function(template, pane) {
         if (!isc.isA.DataBoundComponent(pane)) return "";
 
-        var selectedRecord = pane.getSelectedRecord();
+        var selectedRecord = pane.getSelectedRecord(),
+            paneDS = pane.getDataSource()
+        ;
 
         var variables = {
-            titleField: selectedRecord == null ? "" : selectedRecord[pane.getTitleField()],
+            titleField: (!selectedRecord || !paneDS) ? "" :
+                          selectedRecord[paneDS.getTitleField()],
             index: selectedRecord == null ? -1 : pane.getRecordIndex(selectedRecord),
-            totalRows: pane.getTotalRows(),
+            totalRows: pane.getTotalRows ? pane.getTotalRows() : 1,
             record: selectedRecord
         };
 
@@ -31269,7 +31750,7 @@ isc._debugModules = (isc._debugModules != null ? isc._debugModules : []);isc._de
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.

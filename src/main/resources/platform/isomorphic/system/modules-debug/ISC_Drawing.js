@@ -1,7 +1,7 @@
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.
@@ -38,9 +38,9 @@ else if(isc._preLog)isc._preLog[isc._preLog.length]=isc._pTM;
 else isc._preLog=[isc._pTM]}isc.definingFramework=true;
 
 
-if (window.isc && isc.version != "v11.1p_2017-12-27/LGPL Deployment" && !isc.DevUtil) {
+if (window.isc && isc.version != "v12.0p_2019-08-29/LGPL Deployment" && !isc.DevUtil) {
     isc.logWarn("SmartClient module version mismatch detected: This application is loading the core module from "
-        + "SmartClient version '" + isc.version + "' and additional modules from 'v11.1p_2017-12-27/LGPL Deployment'. Mixing resources from different "
+        + "SmartClient version '" + isc.version + "' and additional modules from 'v12.0p_2019-08-29/LGPL Deployment'. Mixing resources from different "
         + "SmartClient packages is not supported and may lead to unpredictable behavior. If you are deploying resources "
         + "from a single package you may need to clear your browser cache, or restart your browser."
         + (isc.Browser.isSGWT ? " SmartGWT developers may also need to clear the gwt-unitCache and run a GWT Compile." : ""));
@@ -7088,6 +7088,36 @@ isc.DrawItem.addClassProperties({
         return a / this._radPerDeg;
     },
 
+    //> @type Coordinate
+    // A number representing a horizontal or vertical offset from the origin of a
+    // +link{DrawPane,coordinate system} in the <code>DrawPane</code>.  +link{DrawRect.left} is
+    // an example of a +link{DrawItem} attribute that's a <code>Coordinate</code>.
+    //
+    // <smartclient>A <code>Coordinate</code> is not limited to integers except for
+    // +link{DrawingType} "vml".</smartclient><smartgwt>
+    // The default getters return a <code>Coordinate</code> as an int, rounding as needed.
+    // Alternative getters with an "AsDouble" suffix may be provided to provide access to the
+    // raw double.  A <code>Coordinate</code> is typed as an int for all setters or other methods
+    // taking a <code>Coordinate</code>.</smartgwt>
+    // @baseType double
+    // @visibility external
+    //<
+
+    //> @type Distance
+    // A number representing the width, height, or radius of a +link{DrawItem} in the
+    // +link{DrawPane}.  +link{DrawRect.width} is an example of a +link{DrawItem} attribute
+    // that's a <code>Distance</code>.
+    //
+    // <smartclient>A <code>Distance</code> is not limited to integers except for
+    // +link{DrawingType} "vml".</smartclient><smartgwt>
+    // The default getters return a <code>Distance</code> as an integer, rounding as needed.
+    // Alternative getters with an "AsDouble" suffix may be provided to provide access to the
+    // raw double.  A <code>Distance</code> is typed as an int for all setters or other methods
+    // taking a <code>Distance</code>.</smartgwt>
+    // @baseType double
+    // @visibility external
+    //<
+
     //> @classAttr drawItem.roundCoordinates (boolean : true : IRWA)
     // Determines the default rounding behavior of +link{_makeCoordinate()} if a valid boolean
     // is not passed for the <code>round</code> parameter.
@@ -9069,6 +9099,7 @@ _normalize : function (x, y, inputCoordinateSystem, outputCoordinateSystem) {
     return transform.transform(x, y);
 },
 
+
 _getNormalizeTransform : function (inputCoordinateSystem, outputCoordinateSystem) {
 
     if (this.drawPane == null) {
@@ -9103,7 +9134,7 @@ _getNormalizeTransform : function (inputCoordinateSystem, outputCoordinateSystem
                     return (
                         this._getLocalTransform(true).getInverse()
                             .translate(-scrollLeft, -scrollTop)
-                            .rightMultiply(this.drawPane.getGlobalTransform()));
+                            .rightMultiply(this.drawPane._getGlobalTransform()));
                 } else { // outputCoordinateSystem == "global"
 
                     // Same as below.
@@ -9135,7 +9166,8 @@ _getNormalizeTransform : function (inputCoordinateSystem, outputCoordinateSystem
             }
         } else { // inputCoordinateSystem == "global"
             if (outputCoordinateSystem == "local") {
-                var transform = this.drawPane._getGlobalTransform().duplicate().rightMultiply(this._getLocalTransform());
+                var transform = this.drawPane._getGlobalTransform().duplicate().
+                                    rightMultiply(this._getLocalTransform());
                 return transform.getInverse();
             } else { // outputCoordinateSystem == "drawing"
                 return this.drawPane._getInverseGlobalTransform();
@@ -11970,7 +12002,7 @@ _setResizeBoundingBox : function (
     var sx = oldWidth  ? newWidth  / oldWidth  : 1,
         sy = oldHeight ? newHeight / oldHeight : 1,
         dx = newLeft - sx * oldLeft,
-        dy = newTop - sy * oldTop;
+        dy = newTop  - sy * oldTop;
 
 
     var transform = isc.AffineTransform.create(sx, 0, dx, 0, sy, dy);
@@ -13100,6 +13132,9 @@ show : function () {
         if (this._htmlText) this._htmlText.show();
         else this.drawPane.redrawBitmap();
     }
+
+    if (this.titleLabel)           this.titleLabel.show();
+    if (this.titleLabelBackground) this.titleLabelBackground.show();
 },
 
 
@@ -13123,6 +13158,9 @@ hide : function () {
         if (this._htmlText) this._htmlText.hide();
         else this.drawPane.redrawBitmap();
     }
+
+    if (this.titleLabel)           this.titleLabel.hide();
+    if (this.titleLabelBackground) this.titleLabelBackground.hide();
 },
 
 //--------------------------------------------------------------------------------
@@ -14255,7 +14293,7 @@ isc.defineClass("DrawGroup", "DrawItem").addProperties({
     //<
     useGroupRect:false,
 
-    //> @attr drawGroup.left (int : 0 : IRW)
+    //> @attr drawGroup.left (Coordinate : 0 : IRW)
     // Left coordinate of the +link{getGroupRect(),group rectangle} in pixels relative to the
     // +link{DrawPane} (the "drawing coordinate system").
     //
@@ -14263,7 +14301,7 @@ isc.defineClass("DrawGroup", "DrawItem").addProperties({
     //<
     left:0,
 
-    //> @attr drawGroup.top (int : 0 : IRW)
+    //> @attr drawGroup.top (Coordinate : 0 : IRW)
     // Top coordinate of the +link{getGroupRect(),group rectangle} in pixels relative to the
     // +link{DrawPane} (the "drawing coordinate system").
     //
@@ -14271,7 +14309,7 @@ isc.defineClass("DrawGroup", "DrawItem").addProperties({
     //<
     top:0,
 
-    //> @attr drawGroup.width (int : 1 : IRW)
+    //> @attr drawGroup.width (Distance : 1 : IRW)
     // Width of the +link{getGroupRect(),group rectangle} in pixels relative to the
     // +link{DrawPane} (the "drawing coordinate system").
     //
@@ -14279,7 +14317,7 @@ isc.defineClass("DrawGroup", "DrawItem").addProperties({
     //<
     width:1,
 
-    //> @attr drawGroup.height (int : 1 : IRW)
+    //> @attr drawGroup.height (Distance : 1 : IRW)
     // Height of the +link{getGroupRect(),group rectangle} in pixels relative to the
     // +link{DrawPane} (the "drawing coordinate system").
     //
@@ -14658,7 +14696,7 @@ _setLineWidthVML : isc.Class.NO_OP,
 // Sets the left coordinate of this <code>DrawGroup</code>'s +link{DrawGroup.getGroupRect(),group rectangle}.
 // Note that setting the left coordinate will not move the items in this <code>DrawGroup</code>.
 //
-// @param left (int) new left coordinate
+// @param left (Coordinate) new left coordinate
 // @visibility drawing
 //<
 setLeft : function (left) {
@@ -14669,7 +14707,7 @@ setLeft : function (left) {
 // Sets the top coordinate of this <code>DrawGroup</code>'s +link{DrawGroup.getGroupRect(),group rectangle}.
 // Note that setting the top coordinate will not move the items in this <code>DrawGroup</code>.
 //
-// @param top (int) new top coordinate in pixels
+// @param top (Coordinate) new top coordinate in pixels
 // @visibility drawing
 //<
 setTop : function (top) {
@@ -14680,7 +14718,7 @@ setTop : function (top) {
 // Sets the width of this <code>DrawGroup</code>'s +link{DrawGroup.getGroupRect(),group rectangle}.
 // Note that setting the width will not move or resize the items in this <code>DrawGroup</code>.
 //
-// @param width (int) new width for the group rectangle
+// @param width (Distance) new width for the group rectangle
 // @visibility drawing
 //<
 setWidth : function (width) {
@@ -14691,7 +14729,7 @@ setWidth : function (width) {
 // Sets the height of this <code>DrawGroup</code>'s +link{DrawGroup.getGroupRect(),group rectangle}.
 // Note that setting the height will not move or resize the items in this <code>DrawGroup</code>.
 //
-// @param height (int) new height for the group rectangle
+// @param height (Distance) new height for the group rectangle
 // @visibility drawing
 //<
 setHeight : function (height) {
@@ -14830,8 +14868,8 @@ _updateLocalTransform : function (transform, cx, cy, initialShape, fireReshaped,
 // Updates the <code>DrawGroup</code>'s left coordinate by <code>dX</code> and the top coordinate
 // by <code>dY</code>. Note that this does not move or resize the items in this <code>DrawGroup</code>.
 //
-// @param dX (int) change to left coordinate in pixels
-// @param dY (int) change to top coordinate in pixels
+// @param dX (Distance) change to left coordinate in pixels
+// @param dY (Distance) change to top coordinate in pixels
 // @visibility drawing
 //<
 
@@ -15059,12 +15097,12 @@ isc.DrawGroup.markUnsupportedMethods(null, ["setStartArrow", "setEndArrow"]);
 // @treeLocation Client Reference/Drawing
 // @visibility drawing
 //<
-//> @attr point.x (int: 0: IR)
+//> @attr point.x (Coordinate: 0: IR)
 // The x coordinate of this point.
 //
 // @visibility drawing
 //<
-//> @attr point.y (int: 0: IR)
+//> @attr point.y (Coordinate: 0: IR)
 // The y coordinate of this point.
 //
 // @visibility drawing
@@ -15108,7 +15146,7 @@ isc.defineClass("DrawLine", "DrawItem").addProperties({
     //<
     endPoint: [100,100],
 
-    //> @attr drawLine.startLeft      (int : 0 : IR)
+    //> @attr drawLine.startLeft      (Coordinate : 0 : IR)
     // Starting left coordinate of the line.  Overrides left coordinate of +link{startPoint} if
     // both are set.
     //
@@ -15116,7 +15154,7 @@ isc.defineClass("DrawLine", "DrawItem").addProperties({
     //<
 //    startLeft:0,
 
-    //> @attr drawLine.startTop       (int : 0 : IR)
+    //> @attr drawLine.startTop       (Coordinate : 0 : IR)
     // Starting top coordinate of the line.  Overrides top coordinate of +link{startPoint} if
     // both are set.
     //
@@ -15124,7 +15162,7 @@ isc.defineClass("DrawLine", "DrawItem").addProperties({
     //<
 //    startTop:0,
 
-    //> @attr drawLine.endLeft        (int : 100 : IR)
+    //> @attr drawLine.endLeft        (Coordinate : 100 : IR)
     // Ending left coordinate of the line.  Overrides left coordinate of +link{endPoint} if
     // both are set.
     //
@@ -15132,7 +15170,7 @@ isc.defineClass("DrawLine", "DrawItem").addProperties({
     //<
 //    endLeft:100,
 
-    //> @attr drawLine.endTop         (int : 100 : IR)
+    //> @attr drawLine.endTop         (Coordinate : 100 : IR)
     // Ending top coordinate of the line.  Overrides top coordinate of +link{endPoint} if
     // both are set.
     //
@@ -15307,8 +15345,8 @@ drawBitmapPath : function (context) {
 //> @method drawLine.setStartPoint()
 // Update the startPoint
 //
-// @param left (int) left coordinate for start point, in pixels
-// @param top (int) top coordinate for start point, in pixels
+// @param left (Coordinate) left coordinate for start point, in pixels
+// @param top (Coordinate) top coordinate for start point, in pixels
 // @visibility drawing
 //<
 setStartPoint : function (left, top, fireMovedAndResized) {
@@ -15326,8 +15364,8 @@ setStartPoint : function (left, top, fireMovedAndResized) {
 //> @method drawLine.setEndPoint()
 // Update the endPoint
 //
-// @param left (int) left coordinate for end point, in pixels
-// @param top (int) top coordinate for end point, in pixels
+// @param left (Coordinate) left coordinate for end point, in pixels
+// @param top (Coordinate) top coordinate for end point, in pixels
 // @visibility drawing
 //<
 setEndPoint : function (left, top, fireMovedAndResized) {
@@ -15791,8 +15829,8 @@ hideEndPointKnobs : function () {
 //> @method drawLine.moveBy()
 // Move both the start and end points of the line by a relative amount.
 //
-// @param left (int) change to left coordinate in pixels
-// @param top (int) change to top coordinate in pixels
+// @param left (Distance) change to left coordinate in pixels
+// @param top (Distance) change to top coordinate in pixels
 // @visibility drawing
 //<
 
@@ -15844,27 +15882,27 @@ updateControlKnobs : function () {
 isc.defineClass("DrawRect", "DrawItem").addProperties({
     // NOTE: left|top|width|height @included elsewhere so should be phrased generically
 
-    //> @attr drawRect.left (int : 0 : IRW)
+    //> @attr drawRect.left (Coordinate : 0 : IRW)
     // Left coordinate in pixels relative to the +link{DrawPane,local coordinate system}.
     //
     // @visibility drawing
     //<
     left:0,
 
-    //> @attr drawRect.top (int : 0 : IRW)
+    //> @attr drawRect.top (Coordinate : 0 : IRW)
     // Top coordinate in pixels relative to the +link{DrawPane,local coordinate system}.
     //
     // @visibility drawing
     //<
     top:0,
 
-    //> @attr drawRect.width        (int : 100 : IRW)
+    //> @attr drawRect.width        (Distance : 100 : IRW)
     // Width in pixels relative to the +link{DrawPane,local coordinate system}.
     // @visibility drawing
     //<
     width:100,
 
-    //> @attr drawRect.height       (int : 100 : IRW)
+    //> @attr drawRect.height       (Distance : 100 : IRW)
     // Height in pixels relative to the +link{DrawPane,local coordinate system}.
     // @visibility drawing
     //<
@@ -16005,8 +16043,8 @@ drawBitmapPath : function (context) {
 
 //> @method drawRect.setCenter()
 // Move the drawRect such that it is centered over the specified coordinates.
-// @param left (int) left coordinate for new center position
-// @param top (int) top coordinate for new center postiion
+// @param left (Coordinate) left coordinate for new center position
+// @param top (Coordinate) top coordinate for new center postiion
 // @visibility drawing
 //<
 setCenter : function (left, top) {
@@ -16182,8 +16220,8 @@ isPointInPath : function (x, y, pageX, pageY) {
 
 //> @method drawRect.moveBy()
 // Move the drawRect by the specified delta
-// @param dX (int) number of pixels to move horizontally
-// @param dY (int) number of pixels to move vertically
+// @param dX (Distance) number of pixels to move horizontally
+// @param dY (Distance) number of pixels to move vertically
 // @visibility drawing
 //<
 
@@ -16196,7 +16234,7 @@ isPointInPath : function (x, y, pageX, pageY) {
 
 //> @method drawRect.setLeft()
 // Set the left coordinate of the drawRect
-// @param left (int) new left coordinate
+// @param left (Coordinate) new left coordinate
 // @visibility drawing
 //<
 setLeft : function (left) {
@@ -16205,7 +16243,7 @@ setLeft : function (left) {
 
 //> @method drawRect.setTop()
 // Set the top coordinate of the drawRect
-// @param top (int) new top coordinate
+// @param top (Coordinate) new top coordinate
 // @visibility drawing
 //<
 setTop : function (top) {
@@ -16221,14 +16259,14 @@ setTop : function (top) {
 
 //> @method drawRect.resizeBy()
 // Resize by the specified delta
-// @param dX (int) number of pixels to resize by horizontally
-// @param dY (int) number of pixels to resize by vertically
+// @param dX (Distance) number of pixels to resize by horizontally
+// @param dY (Distance) number of pixels to resize by vertically
 // @visibility drawing
 //<
 
 //> @method drawRect.setWidth()
 // Set the width of the drawRect
-// @param width (int) new width
+// @param width (Distance) new width
 // @visibility drawing
 //<
 setWidth : function (width) {
@@ -16237,7 +16275,7 @@ setWidth : function (width) {
 
 //> @method drawRect.setHeight()
 // Set the height of the drawRect
-// @param height (int) new height
+// @param height (Distance) new height
 // @visibility drawing
 //<
 setHeight : function (height) {
@@ -16437,22 +16475,22 @@ isc.DrawRect.markUnsupportedMethods(null, ["setStartArrow", "setEndArrow"]);
 
 isc.defineClass("DrawOval", "DrawItem").addProperties({
 
-    //> @attr drawOval.left (int : 0 : IRW)
+    //> @attr drawOval.left (Coordinate : 0 : IRW)
     // @include drawRect.left
     //<
     left:0,
 
-    //> @attr drawOval.top (int : 0 : IRW)
+    //> @attr drawOval.top (Coordinate : 0 : IRW)
     // @include drawRect.top
     //<
     top:0,
 
-    //> @attr drawOval.width (int : 100 : IRW)
+    //> @attr drawOval.width (Distance : 100 : IRW)
     // @include drawRect.width
     //<
     width:100,
 
-    //> @attr drawOval.height (int : 100 : IRW)
+    //> @attr drawOval.height (Distance : 100 : IRW)
     // @include drawRect.height
     //<
     height:100,
@@ -16462,7 +16500,7 @@ isc.defineClass("DrawOval", "DrawItem").addProperties({
     // @visibility drawing
     //<
 
-    //> @attr drawOval.radius (int : null : IW)
+    //> @attr drawOval.radius (Distance : null : IW)
     // Radius of the oval. Since this is used to initialize the +link{DrawOval.getRadiusX(),horizontal}
     // and +link{DrawOval.getRadiusY(),vertical} radii, then the oval is a circle.
     // <p>
@@ -16620,15 +16658,15 @@ drawBitmapPath : function (context) {
 
 //> @method drawOval.setCenterPoint()
 // Change the center point for this oval.
-// @param left (int) left coordinate (in the global coordinate system)
-// @param top (int) top coordinate (in the global coordinate system)
+// @param left (Coordinate) left coordinate (in the global coordinate system)
+// @param top (Coordinate) top coordinate (in the global coordinate system)
 // @visibility drawing
 //<
 
 //> @method drawOval.moveBy()
 // Move the drawOval by the specified delta
-// @param dX (int) number of pixels to move horizontally
-// @param dY (int) number of pixels to move vertically
+// @param dX (Distance) number of pixels to move horizontally
+// @param dY (Distance) number of pixels to move vertically
 // @visibility drawing
 //<
 
@@ -16642,7 +16680,7 @@ drawBitmapPath : function (context) {
 
 //> @method drawOval.setLeft()
 // Set the left coordinate of the drawOval
-// @param left (int) new left coordinate
+// @param left (Coordinate) new left coordinate
 // @visibility drawing
 //<
 setLeft : function (left) {
@@ -16651,7 +16689,7 @@ setLeft : function (left) {
 
 //> @method drawOval.setTop()
 // Set the top coordinate of the drawOval
-// @param top (int) new top coordinate
+// @param top (Coordinate) new top coordinate
 // @visibility drawing
 //<
 setTop : function (top) {
@@ -16663,8 +16701,8 @@ setTop : function (top) {
 // coordinates, meaning the center positon of the oval may change. You may also use
 // +link{drawOval.setRadii()} to change the radius in either direction without modifying the
 // centerpoint.
-// @param dX (int) number of pixels to resize by horizontally
-// @param dY (int) number of pixels to resize by vertically
+// @param dX (Distance) number of pixels to resize by horizontally
+// @param dY (Distance) number of pixels to resize by vertically
 // @visibility drawing
 //<
 
@@ -16680,7 +16718,7 @@ setTop : function (top) {
 
 //> @method drawOval.setWidth()
 // Set the width of the drawOval
-// @param width (int) new width
+// @param width (Distance) new width
 // @visibility drawing
 //<
 setWidth : function (width) {
@@ -16689,7 +16727,7 @@ setWidth : function (width) {
 
 //> @method drawOval.setHeight()
 // Set the height of the drawOval
-// @param height (int) new height
+// @param height (Distance) new height
 // @visibility drawing
 //<
 setHeight : function (height) {
@@ -16828,7 +16866,7 @@ _saveShape : function () {
 
 //> @method drawOval.getRadiusX()
 // Returns the horizontal radius of the DrawOval.
-// @return (int) the horizontal radius.
+// @return (Distance) the horizontal radius.
 // @see DrawOval.setRadii()
 // @visibility drawing
 //<
@@ -16838,7 +16876,7 @@ getRadiusX : function () {
 
 //> @method drawOval.getRadiusY()
 // Returns the vertical radius of the DrawOval.
-// @return (int) the vertical radius.
+// @return (Distance) the vertical radius.
 // @see DrawOval.setRadii()
 // @visibility drawing
 //<
@@ -16849,8 +16887,8 @@ getRadiusY : function () {
 //> @method drawOval.setRadii()
 // Resize the drawOval by setting its horizontal and vertical radius, and retaining its current
 // center point.
-// @param rx (int) new horizontal radius
-// @param ry (int) new vertical radius
+// @param rx (Distance) new horizontal radius
+// @param ry (Distance) new vertical radius
 // @see DrawOval.getRadiusX()
 // @see DrawOval.getRadiusY()
 // @visibility drawing
@@ -16866,7 +16904,7 @@ setRadii : function (rx, ry) {
 //> @method drawOval.setRadius()
 // Resize the drawOval by setting its radius, and retaining its current center point.
 // Equivalent to <code>setRadii(radius, radius)</code>.
-// @param radius (int) new radius. This will be applied on both axes, meaning calling this
+// @param radius (Distance) new radius. This will be applied on both axes, meaning calling this
 // method will always result in the DrawOval being a circle.
 // @see DrawOval.setRadii()
 // @visibility drawing
@@ -16877,10 +16915,10 @@ setRadius : function (radius) {
 
 //> @method drawOval.setOval()
 // Resize and reposition the drawOval by setting its radius, and centerPoint.
-// @param cx (int) new horizontal center point coordinate
-// @param cy (int) new vertical center point coordinate
-// @param rx (int) new horizontal radius
-// @param ry (int) new vertical radius
+// @param cx (Coordinate) new horizontal center point coordinate
+// @param cy (Coordinate) new vertical center point coordinate
+// @param rx (Distance) new horizontal radius
+// @param ry (Distance) new vertical radius
 // @visibility drawing
 //<
 setOval : function (cx, cy, rx, ry) {
@@ -16988,7 +17026,7 @@ isc.DrawSector.addProperties({
     //<
     endAngle: 20.0,
 
-    //> @attr drawSector.radius         (int : 100: IR)
+    //> @attr drawSector.radius         (Distance : 100: IR)
     // Radius of the sector.
     // @visibility drawing
     //<
@@ -17349,15 +17387,15 @@ drawBitmapPath : function (context) {
 
 //> @method drawSector.setCenterPoint()
 // Change the center point for this sector.
-// @param left (int) X coordinate of the center point (in the global coordinate system).
-// @param top (int) Y coordinate of the center point (in the global coordinate system.
+// @param left (Coordinate) X coordinate of the center point (in the global coordinate system).
+// @param top (Coordinate) Y coordinate of the center point (in the global coordinate system.
 // @visibility drawing
 //<
 
 //> @method drawSector.moveBy()
 // Move the DrawSector by the specified amounts.
-// @param x (int) number of pixels to move by horizontally
-// @param y (int) number of pixels to move by vertically
+// @param x (Distance) number of pixels to move by horizontally
+// @param y (Distance) number of pixels to move by vertically
 // @visibility drawing
 //<
 
@@ -17579,13 +17617,13 @@ setEscapeContents : function (escapeContents) {
     this.setContents(contents);
 },
 
-//> @attr drawLabel.left (int : 0 : IR)
+//> @attr drawLabel.left (Coordinate : 0 : IR)
 // Sets the amount from the left of its positioning that the element should be placed.
 // @visibility drawing
 //<
 left:0,
 
-//> @attr drawLabel.top (int : 0 : IR)
+//> @attr drawLabel.top (Coordinate : 0 : IR)
 // Sets the amount from the top of its positioning that the element should be placed.
 // @visibility drawing
 //<
@@ -18109,7 +18147,7 @@ getCenter : function () {
 },
 
 //> @method drawLabel.getBoundingBox()
-// Returns the top, left, top + textHeight, left + textWidth
+// Returns the left, top, left + textWidth, top + textHeight
 // @return (Array of double) x1, y1, x2, y2 coordinates
 // @visibility drawing
 //<
@@ -18266,7 +18304,9 @@ _useHTML : function () {
 drawBitmap : function (context) {
     var drawBitmapState = this.drawPane._drawBitmapState;
 
-    if ((drawBitmapState == null || drawBitmapState._tmpBitmapContext == null) && this._useHTML()) {
+    if ((drawBitmapState == null || drawBitmapState._tmpBitmapContext == null) &&
+        this._useHTML())
+    {
         // option to render as HTML.  Needed for some older browsers or on mobile devices so
         // that the text is not blurry.
         if (this._htmlText == null) {
@@ -18274,7 +18314,8 @@ drawBitmap : function (context) {
 
         // update the htmlText transform
         } else {
-            isc.Element._updateTransformStyle(this._htmlText, this._htmlText._getTransformFunctions());
+            isc.Element._updateTransformStyle(this._htmlText,
+                                              this._htmlText._getTransformFunctions());
         }
     } else {
         this.Super("drawBitmap", arguments);
@@ -18823,22 +18864,22 @@ isc.DrawLabel.markUnsupportedMethods(null, ["setStartArrow", "setEndArrow"]);
 //------------------------------------------------------------------------------------------
 
 isc.defineClass("DrawImage", "DrawItem").addProperties({
-    //> @attr drawImage.left (int : 0 : IRW)
+    //> @attr drawImage.left (Coordinate : 0 : IRW)
     // @include drawRect.left
     //<
     left:0,
 
-    //> @attr drawImage.top (int : 0 : IRW)
+    //> @attr drawImage.top (Coordinate : 0 : IRW)
     // @include drawRect.top
     //<
     top:0,
 
-    //> @attr drawImage.width    (int : 16 : IRW)
+    //> @attr drawImage.width    (Distance : 16 : IRW)
     // @include drawRect.width
     //<
     width:16,
 
-    //> @attr drawImage.height   (int : 16 : IRW)
+    //> @attr drawImage.height   (Distance : 16 : IRW)
     // @include drawRect.height
     //<
     height:16,
@@ -19058,7 +19099,7 @@ setSrc: function (src) {
 
 //> @method drawImage.setLeft()
 // Set the left coordinate of the drawImage.
-// @param left (int) new left coordinate
+// @param left (Coordinate) new left coordinate
 // @visibility drawing
 //<
 setLeft : function (left) {
@@ -19067,7 +19108,7 @@ setLeft : function (left) {
 
 //> @method drawImage.setTop()
 // Set the top coordinate of the drawImage.
-// @param top (int) new top coordinate
+// @param top (Coordinate) new top coordinate
 // @visibility drawing
 //<
 setTop : function (top) {
@@ -19076,7 +19117,7 @@ setTop : function (top) {
 
 //> @method drawImage.setWidth()
 // Set the width of the drawImage.
-// @param width (int) new width
+// @param width (Distance) new width
 // @visibility drawing
 //<
 setWidth : function (width) {
@@ -19085,7 +19126,7 @@ setWidth : function (width) {
 
 //> @method drawImage.setHeight()
 // Set the height of the drawImage.
-// @param height (int) new height
+// @param height (Distance) new height
 // @visibility drawing
 //<
 setHeight : function (height) {
@@ -19181,8 +19222,8 @@ _setLineWidthVML : isc.Class.NO_OP,
 
 //> @method drawImage.moveBy()
 // Move the drawImage by the specified delta
-// @param dX (int) number of pixels to move horizontally
-// @param dY (int) number of pixels to move vertically
+// @param dX (Distance) number of pixels to move horizontally
+// @param dY (Distance) number of pixels to move vertically
 // @visibility drawing
 //<
 
@@ -20617,8 +20658,8 @@ setEndPoint : function (left, top) {
 //> @method drawCurve.setControlPoint1()
 // Updates the first cubic B&#233;zier control point.
 //
-// @param left (int) left coordinate for control point, in pixels
-// @param top (int) top coordinate for control point, in pixels
+// @param left (Coordinate) left coordinate for control point, in pixels
+// @param top (Coordinate) top coordinate for control point, in pixels
 // @visibility drawing
 //<
 setControlPoint1 : function (left, top) {
@@ -20650,8 +20691,8 @@ setControlPoint1 : function (left, top) {
 //> @method drawCurve.setControlPoint2()
 // Updates the second cubic B&#233;zier control point.
 //
-// @param left (int) left coordinate for control point, in pixels
-// @param top (int) top coordinate for control point, in pixels
+// @param left (Coordinate) left coordinate for control point, in pixels
+// @param top (Coordinate) top coordinate for control point, in pixels
 // @visibility drawing
 //<
 setControlPoint2 : function (left, top) {
@@ -21585,8 +21626,8 @@ moveStartPointTo : function (x, y) {
 //> @method drawCurve.moveBy()
 // Increment start, end and control points of this curve
 //
-// @param x (int) new x coordinate in pixels
-// @param y (int) new y coordinate in pixels
+// @param x (Distance) new x coordinate in pixels
+// @param y (Distance) new y coordinate in pixels
 // @visibility drawing
 //<
 
@@ -22217,8 +22258,8 @@ moveFirstPointTo : function (left, top) {
 //> @method drawPath.moveBy(dX,dY)
 // Move the points by dX,dY
 //
-// @param dX (int) delta x coordinate in pixels
-// @param dY (int) delta y coordinate in pixels
+// @param dX (Distance) delta x coordinate in pixels
+// @param dY (Distance) delta y coordinate in pixels
 // @visibility drawing
 //<
 
@@ -22231,8 +22272,8 @@ moveFirstPointTo : function (left, top) {
 
 //> @method drawPath.resizeBy()
 // Resize by the specified delta
-// @param dX (int) number of pixels to resize by horizontally
-// @param dY (int) number of pixels to resize by vertically
+// @param dX (Distance) number of pixels to resize by horizontally
+// @param dY (Distance) number of pixels to resize by vertically
 // @visibility drawing
 //<
 
@@ -23059,8 +23100,8 @@ getCenter : function () {
 
 //> @method drawTriangle.resizeBy()
 // Resize by the specified delta
-// @param dX (int) number of pixels to resize by horizontally
-// @param dY (int) number of pixels to resize by vertically
+// @param dX (Distance) number of pixels to resize by horizontally
+// @param dY (Distance) number of pixels to resize by vertically
 // @visibility drawing
 //<
 
@@ -23087,27 +23128,27 @@ getCenter : function () {
 isc.defineClass("DrawDiamond", "DrawPolygon");
 
 isc.DrawDiamond.addProperties({
-    //> @attr drawDiamond.left (int : 0 : IRW)
+    //> @attr drawDiamond.left (Coordinate : 0 : IRW)
     // Left coordinate of the diamond. This is the X coordinate of the western point of the
     // diamond.
     // @visibility drawing
     //<
     left:0,
 
-    //> @attr drawDiamond.top (int : 0 : IRW)
+    //> @attr drawDiamond.top (Coordinate : 0 : IRW)
     // Top coordinate of the diamond. This is the Y coordinate of the northern point of the
     // diamond.
     // @visibility drawing
     //<
     top:0,
 
-    //> @attr drawDiamond.width        (int : 100 : IRW)
+    //> @attr drawDiamond.width        (Distance : 100 : IRW)
     // Width of the diamond. Must be non-negative.
     // @visibility drawing
     //<
     width:100,
 
-    //> @attr drawDiamond.height       (int : 100 : IRW)
+    //> @attr drawDiamond.height       (Distance : 100 : IRW)
     // Height of the diamond. Must be non-negative.
     // @visibility drawing
     //<
@@ -23353,25 +23394,25 @@ isc.defineClass("DrawLinePath", "DrawPath").addProperties({
     //<
     controlPoint2: null,
 
-    //> @attr drawLinePath.tailSize (int : 30 : IR)
+    //> @attr drawLinePath.tailSize (Distance : 30 : IR)
     // Length of the horizontal/vertical "tail segments" between the start and end points of
     // this DrawLinePath and the connecting center segment.
     // @visibility drawing
     //<
     tailSize: 30,
 
-    //> @attr drawLinePath.startLeft (int : 0 , IRW)
+    //> @attr drawLinePath.startLeft (Coordinate : 0 , IRW)
     // @include drawLine.startLeft
     //<
-    //> @attr drawLinePath.startTop (int : 0 , IRW)
+    //> @attr drawLinePath.startTop (Coordinate : 0 , IRW)
     // @include drawLine.startTop
     //<
 
-    //> @attr drawLinePath.endLeft (int : 0 , IRW)
+    //> @attr drawLinePath.endLeft (Coordinate : 0 , IRW)
     // @include drawLine.endLeft
     //<
 
-    //> @attr drawLinePath.endTop (int : 0 , IRW)
+    //> @attr drawLinePath.endTop (Coordinate : 0 , IRW)
     // @include drawLine.endTop
     //<
 
@@ -23558,8 +23599,8 @@ isc.defineClass("DrawLinePath", "DrawPath").addProperties({
     //> @method drawLinePath.setControlPoint1()
     // Sets the coordinates of the controlPoint1 knob and by extension the coordinates of this
     // DrawLinePath's leading tail segment.
-    // @param left (int) left coordinate for start point, in pixels
-    // @param top (int) top coordinate for start point, in pixels
+    // @param left (Coordinate) left coordinate for start point, in pixels
+    // @param top (Coordinate) top coordinate for start point, in pixels
     // @visibility drawing
     //<
     setControlPoint1 : function (left, top, fireMovedAndResized, cx0, cy0) {
@@ -23580,8 +23621,8 @@ isc.defineClass("DrawLinePath", "DrawPath").addProperties({
     //> @method drawLinePath.setControlPoint2()
     // Sets the coordinates of the controlPoint2 knob and by extension the coordinates of this
     // DrawLinePath's trailing tail segment.
-    // @param left (int) left coordinate for start point, in pixels
-    // @param top (int) top coordinate for start point, in pixels
+    // @param left (Coordinate) left coordinate for start point, in pixels
+    // @param top (Coordinate) top coordinate for start point, in pixels
     // @visibility drawing
     //<
     setControlPoint2 : function (left, top, fireMovedAndResized, cx0, cy0) {
@@ -24308,15 +24349,15 @@ _getBoundingBoxOfTransformedShape : function (
 
 //> @method drawShape.moveBy()
 // Move the drawShape by the specified delta
-// @param dX (int) number of pixels to move horizontally
-// @param dY (int) number of pixels to move vertically
+// @param dX (Distance) number of pixels to move horizontally
+// @param dY (Distance) number of pixels to move vertically
 // @visibility drawing
 //<
 
 //> @method drawShape.resizeBy()
 // Resize by the specified delta
-// @param dX (int) number of pixels to resize by horizontally
-// @param dY (int) number of pixels to resize by vertically
+// @param dX (Distance) number of pixels to resize by horizontally
+// @param dY (Distance) number of pixels to resize by vertically
 // @visibility drawing
 //<
 
@@ -24848,7 +24889,7 @@ _quadTreeItemCompareFunc : function (item1, item2) {
                 return index1 - index2;
             } else {
 
-                return item1._addOrder - index2._addOrder;
+                return item1._addOrder - item2._addOrder;
             }
         }
     }
@@ -26511,7 +26552,7 @@ isc._debugModules = (isc._debugModules != null ? isc._debugModules : []);isc._de
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.

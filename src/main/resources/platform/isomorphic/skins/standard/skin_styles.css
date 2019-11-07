@@ -1067,8 +1067,8 @@ ul {
 }
 
 .iconButton,
-.iconButtonFocused,
 .iconButtonDown,
+.iconButtonFocused,
 .iconButtonSelected,
 .iconButtonSelectedFocused,
 .iconButtonSelectedDown,
@@ -1103,6 +1103,7 @@ ul {
 .iconButtonDown,
 .iconButtonSelected,
 .iconButtonSelectedOver,
+.iconButtonFocused,
 .iconButtonFocusedOver,
 .iconButtonSelectedFocusedOver {
     background: #CCCCCC;
@@ -1961,6 +1962,10 @@ a.calMonthEventLink:active {color:blue; text-decoration:none}
 .zoneCanvasLabel,
 .indicatorCanvasLabel {
   border: 1px solid black;
+}
+
+.eventDragCanvas {
+  border: 1px dashed red;
 }
 
 /*============================================================

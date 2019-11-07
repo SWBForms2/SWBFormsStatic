@@ -213,6 +213,97 @@ Button (also used as MenuButton base style)
     font-size:11px; color:#666666;
 }
 
+
+/*=============================================================================================
+    ...Rotated styles, parallel those of headerButton and similar above, but are intended for
+    header buttons with rotated (vertical) titles, so must provide top and bottom padding.
+==============================================================================================*/
+.headerButtonRotated {
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fcfcfc), color-stop(24%, #f7f7f7), color-stop(62%, #e8e8e8), color-stop(71%, #e8e8e8), color-stop(100%, #e8e8e8)) padding-box;
+  background: -moz-linear-gradient(top, #fcfcfc 0%, #f7f7f7 24%, #e8e8e8 62%, #e8e8e8 71%, #e8e8e8 100%) padding-box;
+  background: -webkit-linear-gradient(top, #fcfcfc 0%, #f7f7f7 24%, #e8e8e8 62%, #e8e8e8 71%, #e8e8e8 100%) padding-box;
+  background: linear-gradient(to bottom, #fcfcfc 0%, #f7f7f7 24%, #e8e8e8 62%, #e8e8e8 71%, #e8e8e8 100%) padding-box;
+}
+
+.headerButtonRotated {
+  color: black;
+  font-family: Verdana,Bitstream Vera Sans,sans-serif;
+  font-size: 11px;
+  border-bottom: 1px solid #bfbfbf;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.headerButtonSelectedRotated {
+  background-image: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%); /* firefox */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7abcff), color-stop(44%,#60abf8), color-stop(100%,#4096ee));
+}
+
+.headerButtonOverRotated,
+.headerButtonDownRotated,
+.headerButtonSelectedOverRotated,
+.headerButtonSelectedDownRotated {
+  color: black;
+  font-family: Verdana,Bitstream Vera Sans,sans-serif;
+  font-size: 11px;
+}
+
+.headerButtonOverRotated {
+  background:#dddddd;
+  background-image : -webkit-gradient(linear, left bottom, left top, color-stop(0.1, rgb(211,211,211)), color-stop(0.71, rgb(242,242,242)), color-stop(0.77, rgb(252,252,252)));
+  background-image :-moz-linear-gradient(center bottom, rgb(211,211,211) 10%, rgb(242,242,242) 71%, rgb(252,252,252) 77%);
+}
+
+.headerButtonDownRotated {
+  background-image : -webkit-gradient(linear, left bottom, left top, color-stop(0.1, rgb(84,137,202)), color-stop(0.55, rgb(108,150,202)), color-stop(0.77, rgb(132,164,202)));
+  background-image : -moz-linear-gradient(center bottom, rgb(84,137,202) 10%, rgb(108,150,202) 55%, rgb(132,164,202) 77%);
+}
+
+.headerButtonSelectedOverRotated,
+.headerButtonSelectedDownRotated {
+  background-image: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%); /* firefox */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7abcff), color-stop(44%,#60abf8), color-stop(100%,#4096ee));
+}
+
+.headerButtonSelectedRotated {
+  color: white;
+  background-color: #f0f6ff;
+  font-family: Verdana,Bitstream Vera Sans,sans-serif;
+  font-size: 11px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.headerButtonDisabledRotated,
+.headerButtonSelectedDisabledRotated {
+  background:#C3C3C3;
+  color: #666666;
+  font-family: Verdana,Bitstream Vera Sans,sans-serif;
+  font-size: 11px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.headerButtonOverRotated,
+.headerButtonDownRotated {
+  color: black;
+  font-family: Verdana,Bitstream Vera Sans,sans-serif;
+  font-size: 11px;
+  background-color: #a2ccf6;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.headerButtonSelectedOverRotated,
+.headerButtonSelectedDownRotated {
+  color: white;
+  background-color: aliceblue;
+  font-family: Verdana,Bitstream Vera Sans,sans-serif;
+  font-size: 11px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
 /* ImgButton */
 .imgButton,
 .imgButtonOver,
@@ -1583,9 +1674,9 @@ Button (also used as MenuButton base style)
 
 .iconButton,
 .iconButtonOver,
+.iconButtonDown,
 .iconButtonFocused,
 .iconButtonFocusedOver,
-.iconButtonDown,
 .iconButtonFocusedDown,
 .iconButtonSelected,
 .iconButtonSelectedFocused,
@@ -1610,6 +1701,7 @@ Button (also used as MenuButton base style)
 .iconButtonDown,
 .iconButtonSelected,
 .iconButtonSelectedOver,
+.iconButtonFocused,
 .iconButtonFocusedOver,
 .iconButtonSelectedFocusedOver {
     background: #D5D5D5;
@@ -2684,6 +2776,10 @@ a.calMonthEventLink:active {color:blue; text-decoration:none}
 .zoneCanvasLabel,
 .indicatorCanvasLabel {
   border: 1px solid black;
+}
+
+.eventDragCanvas {
+  border: 1px dashed red;
 }
 
 /*============================================================

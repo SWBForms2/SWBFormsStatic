@@ -1,7 +1,7 @@
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.
@@ -38,9 +38,9 @@ else if(isc._preLog)isc._preLog[isc._preLog.length]=isc._pTM;
 else isc._preLog=[isc._pTM]}isc.definingFramework=true;
 
 
-if (window.isc && isc.version != "v11.1p_2017-12-27/LGPL Deployment" && !isc.DevUtil) {
+if (window.isc && isc.version != "v12.0p_2019-08-29/LGPL Deployment" && !isc.DevUtil) {
     isc.logWarn("SmartClient module version mismatch detected: This application is loading the core module from "
-        + "SmartClient version '" + isc.version + "' and additional modules from 'v11.1p_2017-12-27/LGPL Deployment'. Mixing resources from different "
+        + "SmartClient version '" + isc.version + "' and additional modules from 'v12.0p_2019-08-29/LGPL Deployment'. Mixing resources from different "
         + "SmartClient packages is not supported and may lead to unpredictable behavior. If you are deploying resources "
         + "from a single package you may need to clear your browser cache, or restart your browser."
         + (isc.Browser.isSGWT ? " SmartGWT developers may also need to clear the gwt-unitCache and run a GWT Compile." : ""));
@@ -103,8 +103,10 @@ isc.defineClass("ListPropertiesSampleTile", "StatefulCanvas").addProperties({
 isc.ListPropertiesSampleTile.addMethods({
     initWidget : function () {
         this.Super("initWidget", arguments);
-        this._canonicalProperties = isc.ListPropertiesPane.getCanonicalListProperties(this.listProperties);
-        this._itemTextPlaceholder = this.imgHTML(isc.Canvas._blankImgURL, 40, 3, "' style='background-color:#999;vertical-align:middle");
+        this._canonicalProperties = isc.ListPropertiesPane.
+            getCanonicalListProperties(this.listProperties);
+        this._itemTextPlaceholder = this.imgHTML({src: isc.Canvas._blankImgURL, width: 40,
+            height: 3, extraCSSText: "background-color:#999;vertical-align:middle;"});
     },
 
     getInnerHTML : function () {
@@ -925,11 +927,10 @@ isc.RichTextCanvas.addMethods({
     // or via a contentEdtiable DIV.
 
     _useDesignMode : function () {
-        return ((isc.Browser.isChrome ||
+        return (isc.Browser.isChrome ||
                  isc.Browser.isSafari ||
                  isc.Browser.isOpera ||
-                 isc.Browser.isMoz) ||
-                isc.screenReader);
+                 isc.Browser.isMoz);
     },
 
     // ---------- Design Mode / IFRAME handling ------------------
@@ -1254,7 +1255,27 @@ isc.RichTextCanvas.addMethods({
             }
             delete isc.EH._allowTextSelection;
 
-        //} else {    //Currently only supported on IE
+
+        } else if (isc.Browser.isEdge) {
+
+            var event = isc.EH.lastEvent;
+            if (event && event.target != this) {
+
+
+                var rtc = this;
+                isc.Timer.setTimeout(function () {
+                    isc.EH._allowTextSelection = true;
+                    var doc = rtc.getContentDocument(),
+                    sel = doc.getSelection();
+                    if (sel) {
+                        var range = sel.getRangeAt(0);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                    delete isc.EH._allowTextSelection;
+                }, 0);
+            }
+
         }
     },
 
@@ -1387,6 +1408,24 @@ isc.RichTextCanvas.addMethods({
                                                  "else event.returnValue=(returnValue!=false)"
                                                 );
             }
+            if (!this._editClickHandler) {
+                this._editClickHandler = isc._makeFunction(
+                                                 "event",
+                                                 "event=event||" + this.getID() + ".getContentWindow().event;" +
+                                                 "var returnValue=" + thisAccessPath + this.getID() + "._iFrameClick(event);" +
+                                                 "/*if(returnValue==false && event.preventDefault)event.preventDefault();" +
+                                                 "else*/ event.returnValue=(returnValue!=false)"
+                                                );
+            }
+            if (!this._editDoubleClickHandler) {
+                this._editDoubleClickHandler = isc._makeFunction(
+                                                 "event",
+                                                 "event=event||" + this.getID() + ".getContentWindow().event;" +
+                                                 "var returnValue=" + thisAccessPath + this.getID() + "._iFrameClick(event,true);" +
+                                                 "/*if(returnValue==false && event.preventDefault)event.preventDefault();" +
+                                                 "else*/ event.returnValue=(returnValue!=false)"
+                                                );
+            }
             if (!this._editKeyDownHandler) {
                 this._editKeyDownHandler = isc._makeFunction(
                                                  "event",
@@ -1451,15 +1490,18 @@ isc.RichTextCanvas.addMethods({
                 keyboardListenersReceiver.addEventListener("keydown", this._editKeyDownHandler, false);
                 keyboardListenersReceiver.addEventListener("keyup", this._editKeyUpHandler, false);
 
+                keyboardListenersReceiver.addEventListener("click", this._editClickHandler, false);
+                keyboardListenersReceiver.addEventListener("dblclick", this._editDoubleClickHandler, false);
+
                 win.addEventListener("scroll", this._editScrollHandler, false);
                 win.addEventListener("focus", this._editFocusHandler, false);
                 win.addEventListener("blur", this._editBlurHandler, false);
             }
-            if (addKeyboardListenersToContentDoc) {
-                contentDoc.body.handleNativeEvents = "false";
 
-                contentDoc.documentElement.handleNativeEvents = "false";
-            }
+
+            contentDoc.body.handleNativeEvents = "false";
+
+            contentDoc.documentElement.handleNativeEvents = "false";
 
             var bodyStyle = this.getContentBody().style;
             // Suppress the default margin
@@ -1528,9 +1570,16 @@ isc.RichTextCanvas.addMethods({
         this._queueContentsChanged();
     },
 
+    _iFrameClick : function (event, doubleClick) {
+        if (doubleClick) {
+            return this.handleDoubleClick({ target: this });
+        } else {
+            return this.handleClick({ target: this });
+        }
+    },
+
     // If using designMode, we need a handler for the native keypress event on our IFRAME
     _iFrameKeyPress : function (event) {
-
         // apply the properties (keyName, etc.) to EH.lastEvent
         isc.EH.getKeyEventProperties(event);
         // Fall through to standard handling, making sure this widget is logged as the
@@ -1544,7 +1593,6 @@ isc.RichTextCanvas.addMethods({
         return isc.EH.handleKeyDown(event, {keyTarget:this});
     },
     _iFrameKeyUp : function (event) {
-
         // apply the properties (keyName, etc.) to EH.lastEvent
         isc.EH.getKeyEventProperties(event);
         return isc.EH.handleKeyUp(event, {keyTarget:this});
@@ -3733,14 +3781,28 @@ isc.RichTextEditor.addProperties({
 
         var props = isc.addProperties({ backgroundColor:this.editAreaBackgroundColor },
                 this.editAreaProperties,
-                {  top:this.toolbarHeight, className:this.editAreaClassName,
+            {
+                top:this.toolbarHeight, className:this.editAreaClassName,
                   left:0, width:"100%", height:"*",
                   contents:this.value,
                   moveFocusOnTab:this.moveFocusOnTab,
 
                   changed : isc.RichTextEditor._canvasContentsChanged,
+
                   getBrowserSpellCheck : function () {
                       return this.parentElement.getBrowserSpellCheck()
+                },
+                handleClick : function () {
+                    // if the canvas doesn't cancel bubbling, fire on the editor
+                    var result = this.Super("handleClick", arguments);
+                    if (result != false) result = this.parentElement.handleClick(arguments);
+                    return result;
+                },
+                handleDoubleClick : function () {
+                    // if the canvas doesn't cancel bubbling, fire on the editor
+                    var result = this.Super("handleDoubleClick", arguments);
+                    if (result != false) result = this.creator.handleDoubleClick(arguments);
+                    return result;
                   }
             }
         );
@@ -4385,7 +4447,7 @@ isc._debugModules = (isc._debugModules != null ? isc._debugModules : []);isc._de
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.

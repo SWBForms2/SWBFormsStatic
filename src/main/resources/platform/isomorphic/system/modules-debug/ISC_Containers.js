@@ -1,7 +1,7 @@
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.
@@ -38,9 +38,9 @@ else if(isc._preLog)isc._preLog[isc._preLog.length]=isc._pTM;
 else isc._preLog=[isc._pTM]}isc.definingFramework=true;
 
 
-if (window.isc && isc.version != "v11.1p_2017-12-27/LGPL Deployment" && !isc.DevUtil) {
+if (window.isc && isc.version != "v12.0p_2019-08-29/LGPL Deployment" && !isc.DevUtil) {
     isc.logWarn("SmartClient module version mismatch detected: This application is loading the core module from "
-        + "SmartClient version '" + isc.version + "' and additional modules from 'v11.1p_2017-12-27/LGPL Deployment'. Mixing resources from different "
+        + "SmartClient version '" + isc.version + "' and additional modules from 'v12.0p_2019-08-29/LGPL Deployment'. Mixing resources from different "
         + "SmartClient packages is not supported and may lead to unpredictable behavior. If you are deploying resources "
         + "from a single package you may need to clear your browser cache, or restart your browser."
         + (isc.Browser.isSGWT ? " SmartGWT developers may also need to clear the gwt-unitCache and run a GWT Compile." : ""));
@@ -573,10 +573,8 @@ _tabIconClickHandler : function () {
 },
 
 tabIconClick : function (tab) {
-
     var ts = this.parentElement;
     return ts._tabIconClick(tab);
-
 },
 
 // reset any native scroll that occurred on focus if the tabs are taller than
@@ -764,7 +762,6 @@ draw : function (a,b,c,d) {
     this.fixLayout();
 
     this.invokeSuper(isc.TabBar, "draw", a,b,c,d);
-    this.bringToFront();
 
     var selectedTab = this.getButton(this.selectedTab);
     // now that the buttons have all drawn, bring the baseline in front of them, then count on
@@ -849,17 +846,17 @@ fixLayout : function () {
     var barPos = this.tabBarPosition;
     if (barPos === isc.Canvas.TOP) {
         //bl.setRect(0, null, this.getScrollWidth(true), null);
-        bl.setWidth(this.getScrollWidth(true));
+        bl.setWidth(Math.max(this.getScrollWidth(true), 1));
     } else if (barPos === isc.Canvas.RIGHT) {
         //bl.setRect(null, 0, null, this.getScrollHeight(true));
-        bl.setHeight(this.getScrollHeight(true));
+        bl.setHeight(Math.max(this.getScrollHeight(true), 1));
     } else if (barPos === isc.Canvas.BOTTOM) {
         //bl.setRect(0, null, this.getScrollWidth(true), null);
-        bl.setWidth(this.getScrollWidth(true));
+        bl.setWidth(Math.max(this.getScrollWidth(true), 1));
     } else {
 
         //bl.setRect(null, 0, null, this.getScrollHeight(true));
-        bl.setHeight(this.getScrollHeight(true));
+        bl.setHeight(Math.max(this.getScrollHeight(true), 1));
     }
 
 
@@ -1094,7 +1091,7 @@ scrollBack : function (animated) {
 dragReorderMove : function () {
     var currentPosition = this.getDropPosition();
     var firstInvalidPos = this.canAddTabs ? this.tabs.length - 1 : this.tabs.length;
-    if (this.canAddTabs && currentPosition >= firstInvalidPos) {
+    if (this.canAddTabs && currentPosition > firstInvalidPos) {
         return this.ns.EH.STOP_BUBBLING;
     }
 
@@ -5315,8 +5312,9 @@ isc.defineClass("Portlet", "Window").addProperties({
     closeConfirmationMessage:"Close portlet?",
 
     //>@attr portlet.closeConfirmationDialogProperties (Dialog Properties : null : IRW)
-    // If specified, this properties block will be passed to +link{isc.confirm()} as the
-    // properties parameter when the +link{closeConfirmationMessage} is shown,
+    // If specified, this properties block will be passed to <smartclient>+link{isc.confirm()}
+    // </smartclient><smartgwt>{@link com.smartgwt.client.util.SC#confirm SC.confirm()}</smartgwt>
+    // as the properties parameter when the +link{closeConfirmationMessage} is shown,
     // allowing developers to customize the appear of the confirmation
     // dialog (modifying its title, etc).
     //
@@ -5338,6 +5336,7 @@ isc.defineClass("Portlet", "Window").addProperties({
     // <smartgwt>Developers may use <code>addCloseClickHandler()</code> to provide custom
     // handling when the user clicks this button.</smartgwt>
     // Custom implementations may call <code>close()</code> to trigger the default behavior.
+    // @return (Boolean) Return false to cancel bubbling the click event
     // @visibility external
     //<
 
@@ -8044,8 +8043,11 @@ isc.defineClass("PortalLayout", "Layout").addProperties({
 // a text message or a text mesage with some standard buttons.
 // <P>
 // Many typical modal dialogs such as alerts and confirmations are built into the system with
-// convenience APIs - see +link{staticMethod:isc.say()}, +link{staticMethod:isc.warn()} and
-// +link{staticMethod:isc.askForValue}.
+// convenience APIs - see <smartclient>+link{staticMethod:isc.say()}, +link{staticMethod:isc.warn()}
+// and +link{staticMethod:isc.askForValue}</smartclient>
+// <smartgwt>{@link com.smartgwt.client.util.SC#say SC.say()},
+// {@link com.smartgwt.client.util.SC#warn SC.warn()} and
+// {@link com.smartgwt.client.util.SC#askforValue SC.askforValue()}</smartgwt>.
 // <P>
 // Dialogs can be modal or non-modal according to +link{Window.isModal,isModal}.
 // <P>
@@ -8505,7 +8507,10 @@ isc.Dialog.addProperties({
     // Array of Buttons to show in the +link{showToolbar,toolbar}, if shown.
     // <P>
     // The set of buttons to use is typically set by calling one of the shortcuts such as
-    // +link{staticMethod:isc.say()} or +link{staticMethod:isc.confirm()}.  A custom set of
+    // <smartclient>+link{staticMethod:isc.say()} or +link{staticMethod:isc.confirm()}</smartclient>
+    // <smartgwt>{@link com.smartgwt.client.util.SC#say SC.say()} or
+    // {@link com.smartgwt.client.util.SC#confirm SC.confirm()} </smartgwt>.
+    // A custom set of
     // buttons can be passed to these shortcuts methods via the "properties" argument, or to a
     // directly created Dialog.
     // <P>
@@ -8803,13 +8808,21 @@ doneClick : function () {
 //> @method Dialog.buttonClick(button)
 // Fires when any button in this Dialog's toolbar is clicked.  Default implementation does nothing.
 //
-// @param button (Button) button that was clicked
+// @param button (StatefulCanvas) button that was clicked
 // @param index (int) index of the button that was clicked
 // @group  buttons
-// @visibility external
+// @visibility smartclient
 //<
 buttonClick : function (button, index) {
 },
+
+//> @method Dialog.sgwtButtonClick(button)
+// @include buttonClick
+// @param targetCanvas (StatefulCanvas) button that was clicked
+// @param index (int) index of the button that was clicked
+// @group  buttons
+// @visibility sgwt
+//<
 
 // for Autotest APIs
 namedLocatorChildren:[
@@ -9253,6 +9266,9 @@ isc.addGlobal("showMessage", function (message, messageType, callback, propertie
     }
     if (!properties) properties = {};
 
+    // messages need to be centered
+    properties.autoCenter = true;
+
     // We support toolbarButtons and buttons - copy across to "buttons" attr so we can
     // easily check if they were specified on the object passed in and otherwise apply defaults.
     if (properties.toolbarButtons != null) {
@@ -9295,6 +9311,11 @@ isc.addGlobal("showMessage", function (message, messageType, callback, propertie
     if (!properties.icon) properties.icon = isc.Dialog.getInstanceProperty(messageType + "Icon");
     if (callback) properties.callback = callback;
 
+    if (message == null) message = "&nbsp;";
+    else if (!isc.isA.String(message)) {
+        message = isc.echo(message);
+        //this.logWarn("Stringifying object passed to showMessage() - '" + message + "'");
+    }
     isc.Dialog.Warn.showMessage(message, properties);
 });
 
@@ -9836,7 +9857,7 @@ isc.LoginDialog.addProperties({
     isModal: true,
     showMinimizeButton:false,
 
-    //> @attr loginDialog.items (Array of String : ["autoChild:loginForm"] : IR)
+    //> @attr loginDialog.items (Array of Canvas | Canvas | String : ["autoChild:loginForm"] : IR)
     // Specifies the dialog contents. By default, the dialog only contains
     // +link{LoginDialog.loginForm}. If desired, additional widgets may be placed before/after
     // the loginForm. To specify these widgets as +link{group:autoChildren}, use the syntax
@@ -11423,7 +11444,8 @@ isc.TabSet.addProperties({
 
     //> @attr tab.canAdaptWidth (Boolean : false : IR)
     // If enabled, the tab will collapse to show just its icon when showing the title would
-    // cause overflow of a containing +link{TabBar}.
+    // cause overflow of a containing +link{TabBar}.  While collapsed, the tab will show its
+    // title on hover, unless an explicit hover has been specified such as by +link{prompt}.
     //
     // @see Button.canAdaptWidth
     // @see Canvas.canAdaptWidth
@@ -11919,6 +11941,13 @@ isc.TabSet.addProperties({
     // <smartclient>"tabScroller"</smartclient>
     // <smartgwt>{@link com.smartgwt.client.types.TabBarControls#TAB_SCROLLER}</smartgwt>
     // to the <code>tabBarControls</code> array.
+    // <P>
+    // <b>Note:</b> Due to tabs supporting +link{tab.canAdaptWidth,adaptive width} and other
+    // complexities of TabSet widget layout, +link{canvas.width,flexible-sized} controls
+    // (including +link{LayoutSpacer,spacers}) aren't supported in <code>tabBarControls</code>.
+    // However, if you take into account the width of your tabs and whether the +link{tabPicker,
+    // picker} and +link{scroller} are present, you can add a fixed-width spacer to achieve the
+    // desired appearance, as long as the set of tabs and TabSet width are static.
     //
     // @group tabBarControls
     // @visibility external
@@ -13234,6 +13263,16 @@ setTabTitle : function (tab, title) {
     this.resetTabPickerMenu();
 },
 
+//>    @method    tabSet.setTabPickerTitle()    (A)
+// Changes the title of the picker menu item of a tab
+// @param    tab      (Tab | number | GlobalId | TabName)
+// @param    pickerTitle    (HTMLString)  new title
+// @visibility external
+//<
+setTabPickerTitle : function (tab, pickerTitle) {
+    this.setTabProperties(tab, {pickerTitle:pickerTitle});
+},
+
 //>    @method    tabSet.setTabIcon() (A)
 // Changes the icon for a tab
 // @param tab (Tab | number | GlobalId | TabName) tab to update
@@ -13898,8 +13937,14 @@ fixLayout : function (deltaX, deltaY) {
     if (this._fixingLayout) return;
     this._fixingLayout = true;
 
+    // make sure the tab bar is in front of the tabbar baseline
+    if (this._tabBarBaseLine.getZIndex(true) >= tb.getZIndex(true)) {
+        tb.moveAbove(this._tabBarBaseLine);
+    }
     // make sure paneContainer is below _tabBarBaseLine
-    if (pc.getZIndex(true) >= this._tabBarBaseLine.getZIndex(true)) pc.moveBelow(this._tabBarBaseLine);
+    if (pc.getZIndex(true) >= this._tabBarBaseLine.getZIndex(true)) {
+        pc.moveBelow(this._tabBarBaseLine);
+    }
 
     if (this.showTabBar == false) {
         tb.hide();
@@ -13914,17 +13959,23 @@ fixLayout : function (deltaX, deltaY) {
                                        tb.baseLineThickness);
 
     // lay out the tabBar and paneContainer, depending on where the tabBar is.
+    var tbWidth, tbHeight;
+    if (this.showTabBar || !this.shrinkElementOnHide) {
+
+        tbWidth =  tb.getWidth();
+        tbHeight = tb.getHeight();
+    } else {
+        tbHeight = tbWidth = tbOverlap = 0;
+    }
+
     var vertical;
-    var tbHeight = (!this.showTabBar && this.shrinkElementOnHide) ? 0 : tb.getHeight();
-    var tbWidth = (!this.showTabBar && this.shrinkElementOnHide ) ? 0 : tb.getWidth();
-    tbOverlap = (!this.showTabBar && this.shrinkElementOnHide ) ? 0: tbOverlap;
     switch (this.tabBarPosition) {
         case isc.Canvas.TOP :
             vertical = false;
             pc.setRect(0,
                        tbHeight - tbOverlap,
                        this.getWidth(),
-                       this.getHeight() - tbHeight + tbOverlap
+                       Math.max(1, this.getHeight() - tbHeight + tbOverlap)
                       );
             break;
         case isc.Canvas.BOTTOM :
@@ -13933,14 +13984,14 @@ fixLayout : function (deltaX, deltaY) {
             pc.setRect(0,
                        0,
                        this.getWidth(),
-                       this.getHeight() - tbHeight + tbOverlap
+                       Math.max(1, this.getHeight() - tbHeight + tbOverlap)
                       );
             break;
         case isc.Canvas.LEFT :
             vertical = true;
             pc.setRect(tbWidth - tbOverlap,
                        0,
-                       this.getWidth() - tbWidth + tbOverlap,
+                       Math.max(1, this.getWidth() - tbWidth + tbOverlap),
                        this.getHeight()
                       );
             break;
@@ -13949,7 +14000,7 @@ fixLayout : function (deltaX, deltaY) {
             tb.setLeft(this.getWidth() - tbWidth);
             pc.setRect(0,
                        0,
-                       this.getWidth() - tbWidth + tbOverlap,
+                       Math.max(1, this.getWidth() - tbWidth + tbOverlap),
                        this.getHeight()
                       );
             break;
@@ -13970,7 +14021,7 @@ fixLayout : function (deltaX, deltaY) {
     // If we're showing the control layout adjust our tab-bar size to take it into account
     if (showControls) {
         this._adjustControlClipping(vertical);
-        this.tabBarControlLayout.bringToFront();
+        this.tabBarControlLayout.moveAbove(tb);
     } else {
         tb.resizeTo(vertical ? null : "100%", vertical ? "100%" : null);
         if (this.isRTL() && !vertical) {
@@ -13983,9 +14034,13 @@ fixLayout : function (deltaX, deltaY) {
 
     var totalTabs = this._getTabSizes();
     if (vertical) {
-        if (tb.getScrollTop() > 0 && totalTabs <= tb.getViewportHeight()) tb.scrollTo(null,0,"descrollTabs");
+        if (tb.getScrollTop() > 0 && totalTabs <= tb.getViewportHeight()) {
+            tb.scrollTo(null, 0, "descrollTabs");
+        }
     } else {
-        if (tb.getScrollLeft() > 0 && totalTabs <= tb.getViewportWidth()) tb.scrollTo(0,null,"descrollTabs");
+        if (tb.getScrollLeft() > 0 && totalTabs <= tb.getViewportWidth()) {
+            tb.scrollTo(0, null, "descrollTabs");
+        }
     }
 
     delete this._fixingLayout;
@@ -14332,7 +14387,7 @@ _adjustControlClipping : function (vertical) {
 
     if (vertical) {
         // size the tabBar so as to show all the controls
-        tb.setHeight(Math.max(0, this.getViewportHeight() -
+        tb.setHeight(Math.max(1, this.getViewportHeight() -
                               this.tabBarControlLayout.getHeight()));
         // except, ensure the first tab is always visible
         if (firstTab && firstTab.isDrawn()) {
@@ -14345,7 +14400,7 @@ _adjustControlClipping : function (vertical) {
         }
     } else {
         // size the tabBar so as to show all the controls
-        tb.setWidth(Math.max(0, this.getViewportWidth() -
+        tb.setWidth(Math.max(1, this.getViewportWidth() -
                              this.tabBarControlLayout.getWidth()));
         // except, ensure the first tab is always visible
         if (firstTab && firstTab.isDrawn()) {
@@ -14681,8 +14736,10 @@ _tabSelected : function (tab) {
 //<
 
 //> @method tab.tabDeselected()
-// Optional handler to fire when a tab is deselected. Returning false will cancel the
-// new selection, leaving this tab selected. As with +link{TabSet.tabSelected()} this
+// Optional handler to fire when a tab is deselected. <smartclient>Returning false</smartclient>
+// <smartgwt>Calling {@link com.smartgwt.client.widgets.tab.events.TabDeselectedEvent#cancel}
+// </smartgwt> will cancel the new selection, leaving this tab selected.
+// As with +link{TabSet.tabSelected()} this
 // method only fires when the tabset is drawn.
 //
 // @param tabSet (TabSet) the tabSet containing the tab.
@@ -15166,7 +15223,7 @@ isc._debugModules = (isc._debugModules != null ? isc._debugModules : []);isc._de
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.

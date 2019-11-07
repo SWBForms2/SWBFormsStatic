@@ -1,7 +1,7 @@
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.
@@ -300,11 +300,8 @@ isc.B.push(isc.A.init=function isc_Process_init(){
             return obj[segments[i]]
         }
     }
-,isc.A.setState=function isc_Process_setState(newState){
-        this.state=newState;
-    }
 );
-isc.B._maxIndex=isc.C+14;
+isc.B._maxIndex=isc.C+13;
 
 isc.Process.registerStringMethods({
     finished:"state"
@@ -873,7 +870,7 @@ isc._debugModules = (isc._debugModules != null ? isc._debugModules : []);isc._de
 /*
 
   SmartClient Ajax RIA system
-  Version v11.1p_2017-12-27/LGPL Deployment (2017-12-27)
+  Version v12.0p_2019-08-29/LGPL Deployment (2019-08-29)
 
   Copyright 2000 and beyond Isomorphic Software, Inc. All rights reserved.
   "SmartClient" is a trademark of Isomorphic Software, Inc.
